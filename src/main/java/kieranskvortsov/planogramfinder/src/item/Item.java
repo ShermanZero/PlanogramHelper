@@ -1,6 +1,6 @@
-package com.kieranskvortsov.lib;
+package kieranskvortsov.planogramfinder.src.item;
 
-import com.kieranskvortsov.lib.Processor.SearchType;
+import kieranskvortsov.planogramfinder.src.Processor.SearchType;
 
 /**
  *

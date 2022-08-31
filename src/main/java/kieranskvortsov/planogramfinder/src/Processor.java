@@ -1,11 +1,19 @@
-package com.kieranskvortsov.lib;
+package kieranskvortsov.planogramfinder.src;
 
+import kieranskvortsov.planogramfinder.src.item.Item;
+import kieranskvortsov.planogramfinder.src.planogram.PlanogramHandler;
 import java.io.File;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JTextArea;
+import kieranskvortsov.planogramfinder.src.gui.GUI;
+import kieranskvortsov.planogramfinder.src.planogram.Planogram;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
@@ -21,7 +29,32 @@ import org.apache.pdfbox.text.PDFTextStripper;
  */
 public class Processor {
     
-    public Processor() {}
+    private PipedOutputStream outputStream;
+    private PipedInputStream inputStream;
+    
+    public Processor(PipedInputStream inputStream) {
+        bindPipe(inputStream);
+    }
+    
+    public void bindPipe(PipedInputStream inputStream) {
+        if(outputStream != null)
+            try {
+                outputStream.close();
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+        
+        outputStream = new PipedOutputStream();
+        
+        try {
+            inputStream.connect(outputStream);
+        } catch (IOException ex) {
+            System.err.println(ex.getMessage());
+            return;
+        }
+        
+        System.setOut(new PrintStream(outputStream));
+    }
     
     public enum SearchType {
         UPC, SKU, WORD;
@@ -36,13 +69,26 @@ public class Processor {
     private final String REGEX_LOCATION = "(?:Fixture)\\s(?:(?!\\d).)*"
             + "(?<FIXTURE>(?:\\w|[.])*)\\s(?:Name)\\s(?<NAME>.*)";
     
-    private JTextArea output;
-    
     //an arraylist to hold individual item objects
-    private ItemArrayList items = new ItemArrayList();
+    private PlanogramHandler planogramHandler = new PlanogramHandler();
     private ArrayList<Item> itemsFound = new ArrayList<>();
     
-    public boolean parse(File file) throws IOException {
+    public void startParsing(File file) {
+        Thread parsingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    parseToPlanogram(file);
+                } catch (IOException | InterruptedException ex) {
+                    System.out.println(ex);
+                }
+            }
+        });
+        
+        parsingThread.start();
+    }
+    
+    public boolean parseToPlanogram(File file) throws IOException, InterruptedException {
         //an array to hold strings for each page
         String[] pageStrings;
         
@@ -73,19 +119,31 @@ public class Processor {
 
         Pattern regexProductPattern     = Pattern.compile(REGEX_PRODUCT);
         Pattern regexLocationPattern    = Pattern.compile(REGEX_LOCATION);
+        
+        System.out.println("Pattern rules:");
+        System.out.println(regexProductPattern.pattern());
+        System.out.println(regexLocationPattern.pattern());
+        
         Matcher productMatcher, locationMatcher;
         
         String currFixture = null, currName = null;
         
         int itemsDiscarded = 0;
+        Item tempItem = null;
         
         //iterate through the pdf's pages
         for(int p = 0; p < pageStrings.length; p++) {
+            System.out.println("Checking page: " + p);
+            GUI.updateProgress(p, pageStrings.length);
+            
             String[] lines = pageStrings[p].split("\n");
             
             //iterate through the lines in the page
             for(int l = 0; l < lines.length; l++) {
+                
                 String currLine = lines[l].trim();
+                
+                if(currLine.contains(",")) continue;
                 
                 productMatcher = regexProductPattern.matcher(currLine);
                 locationMatcher = regexLocationPattern.matcher(currLine);
@@ -95,18 +153,18 @@ public class Processor {
                     //update the fixture and name we are currently looking at
                     currFixture = locationMatcher.group("FIXTURE");
                     currName    = locationMatcher.group("NAME");
-                    
+
                 //otherwise check to see if the current line is a product
                 } else if(productMatcher.matches()){
                     String SKU = productMatcher.group("SKU");
-                    
-                    if(items.containsItem(SKU)) { 
+
+                    if(planogramHandler.containsAny(SKU)) { 
                         itemsDiscarded++;
                         continue;
                     }
-                    
+
                     //create a new item
-                    Item i = new Item(
+                    tempItem = new Item(
                             Integer.parseInt(productMatcher.group(1)), 
                             SKU,
                             productMatcher.group("DESCRIPTION"),
@@ -116,66 +174,66 @@ public class Processor {
                             productMatcher.group("NEW").equalsIgnoreCase("new")
                         );
                     //set the fixture and name for the item
-                    i.setFixture(currFixture);
-                    i.setName(currName);
+                    tempItem.setFixture(currFixture);
+                    tempItem.setName(currName);
 
                     //add the item to the arraylist
-                    tempItems.add(i);
+                    tempItems.add(tempItem);
                 }
             }
         }
         
-//        for(Item i : items)
-//             output.append("\n"+i.toString());
-
-        
         if(itemsDiscarded > 0)
-            output.append(String.format("[%d] duplicate items discarded\n", itemsDiscarded));
+            System.out.println(String.format("[%d] duplicate items discarded", 
+                    itemsDiscarded));
         
         if(!tempItems.isEmpty()) {
-            output.append(String.format("[%d] items parsed from [%d] pages\n", 
+            System.out.println(String.format("[%d] items parsed from [%d] pages", 
                     tempItems.size(), pageStrings.length));
-            items.addAll(tempItems);
+            
+            Planogram p = new Planogram(file.getAbsolutePath());
+            p.addItems(tempItems);
+            
+            planogramHandler.add(p);
         }
+        
+        GUI.setProgress(100);
+        Thread.sleep(1000);
+        GUI.setProgress(0);
         
         return true;
     }
     
-    public void attachLog(JTextArea textArea) {
-        output = textArea;
-    }
-    
     public String getPrintableSheet(ArrayList<String> itemSKUs) {
-        String printable = Item.getHeader();
-        for(String SKU : itemSKUs)
-            printable += items.getItem(SKU).getPrintable()+ "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append(Item.getHeader());
         
-        return printable;
+        itemSKUs.stream().forEach(SKU -> {
+            sb.append(planogramHandler.getItem(SKU).getPrintable());
+        });
+        
+        return sb.toString();
     }
     
-    public Item[] search(String lastDigits, SearchType searchType) {
+    public Item[] search(String query, SearchType searchType) {
+        if(planogramHandler.isEmpty()) return null;
+        
         itemsFound.clear();
         
-        for(Item i : items)
-            if(i.matches(lastDigits, searchType)) itemsFound.add(i);
+        itemsFound = planogramHandler.getItems(query, searchType);
         
         if(itemsFound.isEmpty()) {
             System.out.println(
-                String.format("No results for item(s) ending in %s:",
-                    lastDigits)
+                String.format("No results for item(s) with %s",
+                    query)
             );
         } else {
             System.out.println(
-                String.format("Search results returned %d item(s) ending in %s:",
+                String.format("Search results returned %d item(s) with %s",
                 itemsFound.size(),
-                lastDigits)
+                query)
             );
-            
-            for(Item i : itemsFound)
-                System.out.println(i);
         }
-        
-        System.out.println();
         
         Item[] itemsArray = new Item[itemsFound.size()];
         itemsArray = itemsFound.toArray(itemsArray);

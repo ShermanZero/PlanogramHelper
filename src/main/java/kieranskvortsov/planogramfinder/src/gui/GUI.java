@@ -1,23 +1,24 @@
 
-package com.kieranskvortsov.gui;
+package kieranskvortsov.planogramfinder.src.gui;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.kieranskvortsov.lib.ItemCustomTableModel;
-import com.kieranskvortsov.lib.Item;
-import com.kieranskvortsov.lib.PlanogramCustomTabelModel;
-import com.kieranskvortsov.lib.Processor;
+import kieranskvortsov.planogramfinder.src.item.ItemCustomTableModel;
+import kieranskvortsov.planogramfinder.src.item.Item;
+import kieranskvortsov.planogramfinder.src.planogram.PlanogramCustomTabelModel;
+import kieranskvortsov.planogramfinder.src.Processor;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.pdfbox.pdmodel.interactive.measurement.PDNumberFormatDictionary;
 
 /**
  *
@@ -29,7 +30,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class GUI extends javax.swing.JFrame {
     
-    private static Processor processor = new Processor();
+    private static PipedInputStream inputStream = new PipedInputStream();
+    private static Processor processor = new Processor(inputStream);
+    
     private static ItemCustomTableModel itemCTM = new ItemCustomTableModel();
     private static PlanogramCustomTabelModel planogramCTM = new PlanogramCustomTabelModel();
     
@@ -39,7 +42,6 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
         initComponents();
         setLocationRelativeTo(null);
-        processor.attachLog(textAreaOutput);
 
         tableItems.setModel(itemCTM);
         tableItems.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -59,6 +61,49 @@ public class GUI extends javax.swing.JFrame {
 
         tablePlanograms.getColumnModel().getColumn(0).setPreferredWidth(60);
         tablePlanograms.getColumnModel().getColumn(1).setPreferredWidth(390);
+        
+        Thread streamPipeReaderThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    if(inputStream != null) {
+                        try {
+                            int data;
+
+                            while((data = inputStream.read()) != -1) {
+                                textAreaOutput.append(Character.toString((char)data));
+                                textAreaOutput.setCaretPosition(textAreaOutput.getText().length());
+                            }
+                        } catch (IOException ex) {
+                            System.err.println(ex);
+                        }
+                    }
+                    
+                    try {
+                        if(inputStream != null) {
+                            inputStream.close();
+                            inputStream = null;
+                        }
+                        
+                        inputStream = new PipedInputStream();
+                        processor.bindPipe(inputStream);
+                    } catch (IOException ex) {
+                        System.err.println(ex);
+                    }
+                }
+            }
+        });
+        
+        streamPipeReaderThread.start();
+    }
+    
+    public static void setProgress(int progress) {
+        progressBar.setValue(progress);
+    }
+    
+    public static void updateProgress(int value, int maximum) {
+        float progress = ((float)value/maximum)*100f;
+        progressBar.setValue((int)progress);
     }
 
     /**
@@ -84,6 +129,7 @@ public class GUI extends javax.swing.JFrame {
         buttonPrint = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tablePlanograms = new javax.swing.JTable();
+        progressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PlanogramFinder");
@@ -230,6 +276,8 @@ public class GUI extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(tablePlanograms);
 
+        progressBar.setOrientation(1);
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -238,26 +286,31 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addComponent(panelGroupBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(4, 4, 4)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(mainPanelLayout.createSequentialGroup()
+                                .addComponent(panelGroupBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(4, 4, 4)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
+                                .addComponent(scrollPaneOutput)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(buttonOpen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(buttonPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(scrollPaneOutput, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                    .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneItemTable)
+                .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPaneOutput, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(scrollPaneOutput)
+                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
@@ -273,9 +326,7 @@ public class GUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -286,6 +337,29 @@ public class GUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPrintActionPerformed
+        itemCTM.clearTable();
+
+        if(itemCTM.getItemsKept().isEmpty()) {
+            System.out.println("Nothing selected to print");
+            return;
+        }
+
+        JTextPane printPane = new JTextPane();
+        printPane.setFont(new Font(Font.MONOSPACED, Font.BOLD, 10));
+        printPane.setForeground(Color.black);
+        printPane.setBackground(Color.white);
+
+        printPane.setText(processor.getPrintableSheet(itemCTM.getItemsKept()));
+
+        try {
+            if(printPane.print())
+                System.out.println("File printed successfully");
+        } catch (PrinterException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }//GEN-LAST:event_buttonPrintActionPerformed
 
     private void buttonOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenActionPerformed
         JFileChooser fileChooser = new JFileChooser();
@@ -298,22 +372,26 @@ public class GUI extends javax.swing.JFrame {
         if(returnVal == JFileChooser.APPROVE_OPTION) {
             f = fileChooser.getSelectedFile();
 
-            try {
-                processor.parse(f);
-            } catch (IOException ex) {
-                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(null, ex);
-                return;
-            }
+            System.out.println("Attempting to parse " + f.getAbsolutePath());
+            processor.startParsing(f);
         }
-        
+
         if(f == null) return;
-        
+
         planogramCTM.addPlanogram(f);
-        
+
         textfieldInput.selectAll();
         textfieldInput.requestFocus();
     }//GEN-LAST:event_buttonOpenActionPerformed
+
+    private void buttonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonClearActionPerformed
+        itemCTM.clearTable();
+    }//GEN-LAST:event_buttonClearActionPerformed
+
+    private void textfieldInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textfieldInputActionPerformed
+        buttonSearchActionPerformed(evt);
+        textfieldInput.selectAll();
+    }//GEN-LAST:event_textfieldInputActionPerformed
 
     private void buttonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSearchActionPerformed
         int selectionIndex = comboBoxSearchType.getSelectedIndex();
@@ -327,63 +405,20 @@ public class GUI extends javax.swing.JFrame {
 
         String digits = textfieldInput.getText();
         Item[] itemsFound = processor.search(digits, type);
+        
+        if(itemsFound == null) return;
 
         itemCTM.clearTable();
-        
+
         for(Item i : itemsFound)
             itemCTM.addItem(i);
-        
+
         itemCTM.updateTable();
-        
+
         textfieldInput.selectAll();
         textfieldInput.requestFocus();
     }//GEN-LAST:event_buttonSearchActionPerformed
 
-    private void textfieldInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textfieldInputActionPerformed
-        buttonSearchActionPerformed(evt);
-        textfieldInput.selectAll();
-    }//GEN-LAST:event_textfieldInputActionPerformed
-
-    private void buttonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPrintActionPerformed
-        itemCTM.clearTable();
-        
-        if(itemCTM.getItemsKept().isEmpty()) {
-            textAreaOutput.append("Nothing selected to print\n");
-            return;
-        }
-        
-        JTextPane printPane = new JTextPane();
-        printPane.setFont(new Font(Font.MONOSPACED, Font.BOLD, 10));
-        printPane.setForeground(Color.black);
-        printPane.setBackground(Color.white);
-        
-        printPane.setText(processor.getPrintableSheet(itemCTM.getItemsKept()));
-        
-        try {
-            printPane.print();
-            textAreaOutput.append("File printed successfully\n");
-        } catch (PrinterException ex) {
-            textAreaOutput.append(ex.getMessage());
-        }
-    }//GEN-LAST:event_buttonPrintActionPerformed
-
-    private void buttonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonClearActionPerformed
-        itemCTM.clearTable();
-    }//GEN-LAST:event_buttonClearActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        FlatDarkLaf.setup();
-       
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GUI().setVisible(true);
-            }
-        });
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonClear;
@@ -394,6 +429,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel panelGroupBottom;
+    private static javax.swing.JProgressBar progressBar;
     private javax.swing.JScrollPane scrollPaneItemTable;
     private javax.swing.JScrollPane scrollPaneOutput;
     private javax.swing.JTable tableItems;
