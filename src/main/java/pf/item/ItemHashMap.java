@@ -1,10 +1,10 @@
 
-package kieranskvortsov.planogramfinder.src.item;
+package pf.item;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import kieranskvortsov.planogramfinder.src.Processor;
+import pf.Processor;
 
 /**
  *
@@ -87,7 +87,7 @@ public class ItemHashMap extends HashMap<String, Item> {
                 results.add(i);
         });
         
-        return results.isEmpty() ? null : results;
+        return results;
     }
     
     @Override

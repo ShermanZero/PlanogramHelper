@@ -1,6 +1,6 @@
-package kieranskvortsov.planogramfinder.src.item;
+package pf.item;
 
-import kieranskvortsov.planogramfinder.src.Processor.SearchType;
+import pf.Processor.SearchType;
 
 /**
  *
@@ -100,7 +100,7 @@ public class Item {
     
     public String getPrintable() {
         return String.format(
-                "%-10s %-13s %-35s %-13s %-15s %s", SKU, UPC, description, 
+                "%-10s %-13s %-35s %-13s %-15s %s\n", SKU, UPC, description, 
                 fixture, name, isNew? "(NEW)":""
             );
     }

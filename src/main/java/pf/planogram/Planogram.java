@@ -1,11 +1,11 @@
 
-package kieranskvortsov.planogramfinder.src.planogram;
+package pf.planogram;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import kieranskvortsov.planogramfinder.src.Processor;
-import kieranskvortsov.planogramfinder.src.item.Item;
-import kieranskvortsov.planogramfinder.src.item.ItemHashMap;
+import pf.Processor;
+import pf.item.Item;
+import pf.item.ItemHashMap;
 
 /**
  *

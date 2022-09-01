@@ -1,19 +1,17 @@
-package kieranskvortsov.planogramfinder.src;
+package pf;
 
-import kieranskvortsov.planogramfinder.src.item.Item;
-import kieranskvortsov.planogramfinder.src.planogram.PlanogramHandler;
+import pf.item.Item;
+import pf.planogram.PlanogramHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import kieranskvortsov.planogramfinder.src.gui.GUI;
-import kieranskvortsov.planogramfinder.src.planogram.Planogram;
+import pf.gui.GUI;
+import pf.planogram.Planogram;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
@@ -73,12 +71,13 @@ public class Processor {
     private PlanogramHandler planogramHandler = new PlanogramHandler();
     private ArrayList<Item> itemsFound = new ArrayList<>();
     
-    public void startParsing(File file) {
+    public void startParsing(File file, Runnable callback) {
         Thread parsingThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     parseToPlanogram(file);
+                    callback.run();
                 } catch (IOException | InterruptedException ex) {
                     System.out.println(ex);
                 }
@@ -197,10 +196,7 @@ public class Processor {
             planogramHandler.add(p);
         }
         
-        GUI.setProgress(100);
-        Thread.sleep(1000);
         GUI.setProgress(0);
-        
         return true;
     }
     

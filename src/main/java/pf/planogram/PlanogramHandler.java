@@ -1,9 +1,9 @@
-package kieranskvortsov.planogramfinder.src.planogram;
+package pf.planogram;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import kieranskvortsov.planogramfinder.src.Processor.SearchType;
-import kieranskvortsov.planogramfinder.src.item.Item;
+import pf.Processor.SearchType;
+import pf.item.Item;
 
 /**
  *
@@ -36,6 +36,6 @@ public class PlanogramHandler extends ArrayList<Planogram> {
             itemsFound.addAll(p.getItemsByQuery(query, searchType));
         });
         
-        return itemsFound.isEmpty() ? null : itemsFound;
+        return itemsFound;
     }
 }

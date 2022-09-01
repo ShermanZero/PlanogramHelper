@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>kieranskvortsov</groupId>
     <artifactId>PlanogramFinder</artifactId>
-    <version>1.0</version>
+    <version>0.1.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <exec.mainClass>kieranskvortsov.planogramfinder.src.Launcher</exec.mainClass>
+        <exec.mainClass>pf.Launcher</exec.mainClass>
     </properties>
     <dependencies>
         <dependency>
@@ -24,6 +24,7 @@
     </dependencies>
     
     <build>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -38,7 +39,7 @@
                             <archive>
                             <manifest>
                                 <mainClass>
-                                    kieranskvortsov.planogramfinder.src.Launcher
+                                    pf.Launcher
                                 </mainClass>
                             </manifest>
                             </archive>
@@ -50,5 +51,12 @@
                 </executions>
             </plugin>
         </plugins>
+        
+        <resources>
+            <resource>
+                <directory>src/main/java/pf/resources-filtered</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>

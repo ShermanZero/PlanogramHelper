@@ -1,5 +1,5 @@
 
-package kieranskvortsov.planogramfinder.src.planogram;
+package pf.planogram;
 
 import java.io.File;
 import javax.swing.table.DefaultTableModel;
