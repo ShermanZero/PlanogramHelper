@@ -10,9 +10,6 @@ import pf.Processor;
  *
  * @author      Kieran Skvortsov
  * @employee#   72141
- * 
- * @version     1.0
- * @date        08.29.2022
  */
 public class ItemHashMap extends HashMap<String, Item> {
     

@@ -9,9 +9,6 @@ import pf.item.Item;
  *
  * @author      Kieran Skvortsov
  * @employee#   72141
- * 
- * @version     1.0
- * @date        08.29.2022
  */
 public class PlanogramHandler extends ArrayList<Planogram> {
     

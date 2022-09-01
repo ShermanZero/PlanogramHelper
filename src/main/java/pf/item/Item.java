@@ -6,9 +6,6 @@ import pf.Processor.SearchType;
  *
  * @author      Kieran Skvortsov
  * @employee#   72141
- * 
- * @version     1.0
- * @date        08.29.2022
  */
 public class Item {
     private final int position;

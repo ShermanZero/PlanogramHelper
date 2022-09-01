@@ -10,7 +10,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import pf.gui.GUI;
+import pf.gui.Main;
 import pf.planogram.Planogram;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -21,14 +21,10 @@ import org.apache.pdfbox.text.PDFTextStripper;
  *
  * @author      Kieran Skvortsov
  * @employee#   72141
- * 
- * @version     1.0
- * @date        08.29.2022
  */
 public class Processor {
     
     private PipedOutputStream outputStream;
-    private PipedInputStream inputStream;
     
     public Processor(PipedInputStream inputStream) {
         bindPipe(inputStream);
@@ -133,7 +129,7 @@ public class Processor {
         //iterate through the pdf's pages
         for(int p = 0; p < pageStrings.length; p++) {
             System.out.println("Checking page: " + p);
-            GUI.updateProgress(p, pageStrings.length);
+            Main.updateProgress(p, pageStrings.length);
             
             String[] lines = pageStrings[p].split("\n");
             
@@ -196,7 +192,7 @@ public class Processor {
             planogramHandler.add(p);
         }
         
-        GUI.setProgress(0);
+        Main.setProgress(0);
         return true;
     }
     
@@ -235,5 +231,10 @@ public class Processor {
         itemsArray = itemsFound.toArray(itemsArray);
         
         return itemsArray;
+    }
+    
+    public void reset() {
+        planogramHandler.clear();
+        itemsFound.clear();
     }
 }
