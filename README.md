@@ -21,8 +21,8 @@ Well I am so glad you asked.  Basically, you upload a fancy KinneyDrugs®-issued
 Well then you should stop wasting your time reading this and look through the repository.  But, if you *must* know, here's what happens after you upload a pdf:
 - Apache's open source [PDFBox](https://pdfbox.apache.org/) goes into work parsing all the text from the file.
 - Kieran's (me) open source PlanogramHelper (this) iterates through the text, looking to pattern match through two regular expressions:
-  - `(?<POSITION>\\d+)\\s(?<SKU>\\d+)\\s(?=.*[a-zA-Z])(?<DESCRIPTION>(?:.*(?!\\d+\\W))*)\\s(?<UPC>\\d*)\\s(?<FACINGS>\\d)\\s*(?<NEW>\\bNEW\\b){0,1}\\n*`
-  - `(?:Fixture)\\s(?:(?!\\d).)*(?<FIXTURE>(?:\\w|[.])*)\\s(?:Name)\\s(?<NAME>.*)`
+  - `(?<POSITION>\d+)\s(?<SKU>\d+)\s(?=.*[a-zA-Z])(?<DESCRIPTION>(?:.*(?!\d+\W))*)\s(?<UPC>\d*)\s(?<FACINGS>\d)\s*(?<NEW>\bNEW\b){0,1}\n*`
+  - `(?:Fixture)\s(?:(?!\d).)*(?<FIXTURE>(?:\w|[.])*)\s(?:Name)\s(?<NAME>.*)`
   
   The first pattern matches how products are displayed, and the second pattern matches how new sections are displayed.
 - More machine language executes to make 1s and 0s make objects stored in HashMaps for easy and effecient O(1) lookups.
