@@ -6,26 +6,26 @@ Hey there someone who probably could hire me, let me tell you why you *should*:
 ![image](https://user-images.githubusercontent.com/16752746/187807356-41a5225e-439b-4fe6-a0f6-f7cb3a09d6bb.png)
 
 ### What does it do?
-Makes life easier for everyone!
+Makes life easier for everyone!  (Finds any product in a planogram)
 
 ### Why does it do that?
-Because I told it to
+Because I told it to!  (Because I told it to)
 
 ### When does it do that?
 As soon as you use it!
 
 ### How does it do that?
-Well I am so glad you asked.  Basically, you upload a fancy KinneyDrugs®-issued planogram, it does some fancy-shmancy behind the scenes work, and presto you've got yourself a handy-dandy list of every product contained in the planogram, searchable by SKU, UPC, or even words!  It'll spit out whatever it can find that matches, just select the items you're looking for, hit that oversized print button, and listen to the heartwarming sounds of machinery as your printer cries happy tears for you.
+So glad you asked!  Basically, you upload an epic KinneyDrugs®-issued planogram, it does some fancy-shmancy behind the scenes work, and presto you've got yourself a handy-dandy list of every product contained in the planogram, searchable by SKU, UPC, or even words!  It'll spit out whatever it can find that matches, just select the items you're looking for, hit that oversized print button, and listen to the heartwarming sounds of machinery as your printer cries happy tears for you.
 
 ### I want a technical explanation
-Well then you should stop wasting your time reading this and look through the repository.  But, if you *must* know, here's what happens after you upload a pdf:
+Well then you should stop wasting your time reading this and look through the repository!  But, if you *must* know, here's what happens after you upload a pdf:
 - Apache's open source [PDFBox](https://pdfbox.apache.org/) goes into work parsing all the text from the file.
 - Kieran's (me) open source PlanogramHelper (this) iterates through the text, looking to pattern match through two regular expressions:
-  - `(?<POSITION>\d+)\s(?<SKU>\d+)\s(?=.*[a-zA-Z])(?<DESCRIPTION>(?:.*(?!\d+\W))*)\s(?<UPC>\d*)\s(?<FACINGS>\d)\s*(?<NEW>\bNEW\b){0,1}\n*`
-  - `(?:Fixture)\s(?:(?!\d).)*(?<FIXTURE>(?:\w|[.])*)\s(?:Name)\s(?<NAME>.*)`
+  - `(\d+)\s(\d+)\s(?=.*[a-zA-Z])((?:.*(?!\d+\W))*)\s(\d*)\s(\d)\s*(\bNEW\b){0,1}\n*`
+  - `(?:Fixture)\s(?:(?!\d).)*((?:\w|[.])*)\s(?:Name)\s(.*)`
   
   The first pattern matches how products are displayed, and the second pattern matches how new sections are displayed.
-- More machine language executes to make 1s and 0s make objects stored in HashMaps for easy and effecient O(1) lookups.
+- More machine language executes to make 1s and 0s turn into objects stored in HashMaps for easy and effecient O(1) lookups.
 - Did I mention that was a threaded execution?  Of course it is!  We can't have the GUI hanging on the end-user after all.
 - Did I also mention that thread also has custom piped input/output streams for the in-app toggleable developer console?
 - Did I also also mention - oh it doesn't matter, there are many different advanced techniques used in this program to showcase my expertise.  Please look around and enjoy the thoroughly documented classes.
@@ -39,10 +39,22 @@ Well then you should stop wasting your time reading this and look through the re
 ![image](https://user-images.githubusercontent.com/16752746/187807629-7ea0d00c-7269-4f2c-bf85-99544ffcda28.png)
 
 ----
-### Wow you're right, I should hire you!
-Yes you should!  I have been programming since I was a young teenager.  Now in my mid-twenties, I have accumulated hundreds of thousands of hours across multiple languages including Java (obviously), C#, Python, PHP, MySQL, MongoDB, Git, Node.js, Javascript, TypeScript, HTML/CSS/SCSS, Svelte/SvelteKit, Unix/bash shell scripting, and so much more!
+
+### Wow!
+Wow indeed!  I have been programming since I was a young teenager.  I was the solo IT Lead for a school district in northern Maine when I was 19 years old, and I wrote my fair share of programs there too.  Now in my mid-twenties, I have accumulated hundreds of thousands of hours across multiple languages including Java (obviously), C#, Python, PHP, MySQL, MongoDB, Git, Node.js, Javascript, TypeScript, HTML/CSS/SCSS, Svelte/SvelteKit, Unix/bash shell scripting, and so much more!
+
+### Have you heard of CTRL-F?
+When I first started as a cashier to get my feet underneath myself after a rough move from Florida, I was frustrated by the lack of resources to find products I couldn't after my eyes glazed over a hundred times.  I specifically asked management if we had any way to reference planograms to find product, and was repeatedly told no.  Well, when I moved up to management and was given access to all managerial things, I started keeping downloaded planograms organized in a folder.  After a recent vitamin reset, there was a large batch of products left laying out, so I CTRL-F'd through the planogram to find if the products still existed in the aisle, if they were marked down, or if they entered limbo.  It sped up workflow significantly and I didn't have to waste my time or others combing through hundreds of labels.
+
+### Is this practical?
+Absolutely!  Even in its current state it is very powerful, although there are many features I would develop if its purpose wasn't just to be an example.  And who knows, if you happen to fall in love with the idea and bring me onto your team, I would be more than happy to continue development and/or integrate with an existing service (SMS, I have my eyes on you).  I originally wrote PlanogramFinder using JDK18 but quickly realized after attempting to run it on systems at work we're only supporting the JRE8 environment (a popular choice, and it makes sense with our already very outdated systems).  Side note - your systems distribution did prevent installation of Node.js, which was my original choice for this program, then it stopped Python too.  JDK18 wasn't allowed to run either despite downloading the binaries and modifying the user's PATH, but it does seem like a security risk that an executeable JAR can run as long as it's written to support JRE8.  Good news though, without the development binaries at least you can't compile .java files locally!  Also, our intranet has no redirects.  A simple browser query with / accesses the entire folder structure and you are free to browse - a .htaccess update might be warranted there.  I have a small background in cybersecurity.
+
+### What additions would you add?
+For starters, I would absolutely be running a database server on the backend that the frontend can pull from.  Since product information seems to be pretty immutable, an SQL database would make sense, but I do love a NoSQL database like Mongo.  Either way, a database that stores all this information fetchable through as-needed frontend update prompts would save lots of resource/processing power and ensure all distributions are synchronized.  It wouldn't surprise me if this database already exists, even if it's just an uncomfortably large excel spreadsheet, but imagine the possibilities of a hosted database.  For enders, that's about it.  There are bugs that need to be fixed (like being allowed to open multiple settings screens), but the largest and most significant change would be a program that doesn't have to use all 2kb of memory on our old computers to parse through a pdf.
 
 ### How do I contact you?
-Well, if you're from KinneyDrugs®, you probably already know how.  Otherwise, shoot me a DM over on my [Twitter](https://twitter.com/ShermanZero) (I guess people still use that, although not me really) or add me on Discord (much faster!) kieran#6425.
+Well, if you're from KinneyDrugs®, you probably already know how since I brought you here.  Otherwise, add me on Discord kieran#6425, or reach me at my professional email found in my GitHub profile.
+
+Thank you for your time, I really appreciate it, and I look forward to hearing from you!
 
 
