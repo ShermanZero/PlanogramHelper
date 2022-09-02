@@ -28,7 +28,7 @@ Well then you should stop wasting your time reading this and look through the re
 - More machine language executes to make 1s and 0s turn into objects stored in HashMaps for easy and effecient O(1) lookups.
 - Did I mention that was a threaded execution?  Of course it is!  We can't have the GUI hanging on the end-user after all.
 - Did I also mention that thread also has custom piped input/output streams for the in-app toggleable developer console?
-- Did I also also mention - oh it doesn't matter, there are many different advanced techniques used in this program to showcase my expertise.  Please look around and enjoy the thoroughly documented classes.
+- Did I also also mention - oh it doesn't matter, there are many different advanced techniques used in this program to showcase my expertise.  Please look around and enjoy the thoroughly documented classes.  **I would start [here](src/main/java/pf/Processor.java) at the heart of the beast.**
 
 ----
 
