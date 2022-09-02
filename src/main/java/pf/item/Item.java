@@ -67,6 +67,13 @@ public class Item {
         return name;
     }
     
+    /**
+     * Returns if a query by a searchtype matches this Item object
+     * 
+     * @param queryString the String to query with
+     * @param searchType the SearchType to query by
+     * @return 
+     */
     public boolean matches(String queryString, SearchType searchType) {
         switch(searchType) {
             case SKU: return SKU.endsWith(queryString);
@@ -77,13 +84,9 @@ public class Item {
         return false;
     }
     
+    //unused - development/testing only
     public String getItemData() {
         return (description + " @ #" + position + (isNew ? " NEW" : ""));
-    }
-    
-    @Override
-    public boolean equals(Object i) {
-        return ((String)i).equals(this.SKU);
     }
     
     @Override
@@ -95,6 +98,11 @@ public class Item {
             );
     }
     
+    /**
+     * Returns a print-suitable formatted String
+     * 
+     * @return 
+     */
     public String getPrintable() {
         return String.format(
                 "%-10s %-13s %-35s %-13s %-15s %s\n", SKU, UPC, description, 
@@ -102,6 +110,11 @@ public class Item {
             );
     }
     
+    /**
+     * Returns the formatted header for a new page
+     * 
+     * @return 
+     */
     public static String getHeader() {
         return String.format(
                 "%-10s %-13s %-35s %-13s %-15s\n",

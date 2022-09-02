@@ -13,6 +13,8 @@ import pf.gui.Main;
  *
  * @author      Kieran Skvortsov
  * @employee#   72141
+ * 
+ * Main class and backbone
  */
 public class Launcher {
     
@@ -36,9 +38,16 @@ public class Launcher {
         }
     }
     
+    /**
+     * Sets up the UI look and feel, loads internal and local properties,
+     * and queues the main window for display
+     * 
+     * @throws IOException 
+     */
     private Launcher() throws IOException {
         FlatDarkLaf.setup();
         
+        //Loads local properties (if they exist)
         File localProps = new File("project.properties");
         if(localProps.exists()) {
             props_local.load(new FileInputStream(localProps));
@@ -49,10 +58,12 @@ public class Launcher {
             APP_PLANOGRAMS = props_local.getProperty("planograms");
         }
         
+        //Loads internal properties packaged in .jar
         props.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
         
-        APP_VERSION                     = props.getProperty("version");
-        APP_ARTIFACTID                  = props.getProperty("artifactId");
+        //These two properties are written to the internal properties file by Maven on build
+        APP_VERSION    = props.getProperty("version");
+        APP_ARTIFACTID = props.getProperty("artifactId");
         
         System.out.println(String.format("%s v%s © 2022 Kieran Skvortsov", APP_ARTIFACTID, APP_VERSION));
         
@@ -64,6 +75,12 @@ public class Launcher {
         });
     }
     
+    /**
+     * Writes out the two properties modifiable in the settings window
+     * 
+     * @param uploadOnLaunch Whether or not to automatically upload planograms on launch
+     * @param planograms List of absolute paths to planogram pdf files
+     */
     public static void writeProperties(boolean uploadOnLaunch, String planograms) {
         APP_UPLOAD_PLANOGRAMS_ON_LAUNCH = uploadOnLaunch;
         APP_PLANOGRAMS = planograms;

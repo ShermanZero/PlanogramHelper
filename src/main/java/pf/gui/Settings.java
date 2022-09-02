@@ -14,7 +14,8 @@ import pf.Launcher;
 
 /**
  *
- * @author Admin
+ * @author      Kieran Skvortsov
+ * @employee#   72141
  */
 public class Settings extends javax.swing.JFrame {
 
@@ -22,7 +23,7 @@ public class Settings extends javax.swing.JFrame {
     private ArrayList<String> planograms = new ArrayList();
     
     /**
-     * Creates new form Settings
+     * Creates new form UI
      */
     public Settings(Component parent) {
         setLocationRelativeTo(parent);
@@ -31,6 +32,11 @@ public class Settings extends javax.swing.JFrame {
         init();
     }
     
+    /**
+     * Initializes the default values of UI to reflect the current
+     * saved properties
+     * 
+     */
     private void init() {
         boolean uploadOnLaunch = Launcher.APP_UPLOAD_PLANOGRAMS_ON_LAUNCH;
         checkBox_uploadOnLaunch.setSelected(uploadOnLaunch);
@@ -72,11 +78,6 @@ public class Settings extends javax.swing.JFrame {
 
         checkBox_uploadOnLaunch.setSelected(true);
         checkBox_uploadOnLaunch.setText("Upload Planograms on Launch");
-        checkBox_uploadOnLaunch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkBox_uploadOnLaunchActionPerformed(evt);
-            }
-        });
 
         list_planograms.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -119,9 +120,7 @@ public class Settings extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(scrollPane_list_planograms, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(68, 68, 68)))
+                            .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(button_add, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -157,6 +156,11 @@ public class Settings extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Saves (writes) the settings out to a local properties file
+     * 
+     * @param evt 
+     */
     private void button_applyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_applyActionPerformed
         boolean uploadOnLaunch = checkBox_uploadOnLaunch.isSelected();
         StringBuilder sb = new StringBuilder();
@@ -171,6 +175,12 @@ public class Settings extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_button_applyActionPerformed
 
+    /**
+     * Opens a new file chooser allowing selection of pdf files and adds
+     * their absolute paths to the list
+     * 
+     * @param evt 
+     */
     private void button_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_addActionPerformed
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -189,16 +199,17 @@ public class Settings extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_button_addActionPerformed
 
+    /**
+     * Removes the currently selected pdf file
+     * 
+     * @param evt 
+     */
     private void button_removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_removeActionPerformed
         int removalIndex = list_planograms.getSelectedIndex();
         String path = dlm_planogram.remove(removalIndex);
         
         planograms.remove(path);
     }//GEN-LAST:event_button_removeActionPerformed
-
-    private void checkBox_uploadOnLaunchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBox_uploadOnLaunchActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_checkBox_uploadOnLaunchActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_add;

@@ -83,6 +83,15 @@ public class Processor {
         parsingThread.start();
     }
     
+    /**
+     * Parses a planogram pdf into objects used for the view model
+     * 
+     * @param file Planogram PDF file
+     * @return
+     * 
+     * @throws IOException
+     * @throws InterruptedException 
+     */
     public boolean parseToPlanogram(File file) throws IOException, InterruptedException {
         //an array to hold strings for each page
         String[] pageStrings;
@@ -110,6 +119,7 @@ public class Processor {
             }
         }
         
+        //temporary list to hold items parsed
         ArrayList<Item> tempItems = new ArrayList<>();
 
         Pattern regexProductPattern     = Pattern.compile(REGEX_PRODUCT);
@@ -181,7 +191,9 @@ public class Processor {
         if(itemsDiscarded > 0)
             System.out.println(String.format("[%d] duplicate items discarded", 
                     itemsDiscarded));
-        
+
+        //add any non-duplicate items to a new Planogram object, and then that
+        //object to the planogram handler
         if(!tempItems.isEmpty()) {
             System.out.println(String.format("[%d] items parsed from [%d] pages", 
                     tempItems.size(), pageStrings.length));
@@ -192,10 +204,17 @@ public class Processor {
             planogramHandler.add(p);
         }
         
+        //update the progress bar in the UI
         Main.setProgress(0);
         return true;
     }
     
+    /**
+     * Returns a printer-friendly formatted String of Items
+     * 
+     * @param itemSKUs
+     * @return 
+     */
     public String getPrintableSheet(ArrayList<String> itemSKUs) {
         StringBuilder sb = new StringBuilder();
         sb.append(Item.getHeader());
@@ -207,11 +226,20 @@ public class Processor {
         return sb.toString();
     }
     
+    /**
+     * Returns an array of Items matching the query
+     * 
+     * @param query The String to query with
+     * @param searchType The SearchType to query by
+     * @return 
+     */
     public Item[] search(String query, SearchType searchType) {
         if(planogramHandler.isEmpty()) return null;
         
+        //clear the arraylist
         itemsFound.clear();
         
+        //search all planograms to find any matching Items based on query
         itemsFound = planogramHandler.getItems(query, searchType);
         
         if(itemsFound.isEmpty()) {
@@ -233,6 +261,9 @@ public class Processor {
         return itemsArray;
     }
     
+    /**
+     * Resets all data (in preparation for a re-upload)
+     */
     public void reset() {
         planogramHandler.clear();
         itemsFound.clear();

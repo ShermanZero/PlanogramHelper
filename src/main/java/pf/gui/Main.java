@@ -36,7 +36,7 @@ public class Main extends javax.swing.JFrame {
     private static PlanogramCustomTabelModel planogramCTM = new PlanogramCustomTabelModel();
     
     /**
-     * Creates new form GUI
+     * Creates new form UI
      */
     public Main() {
         initComponents();
@@ -71,6 +71,10 @@ public class Main extends javax.swing.JFrame {
             menuItem_reuploadActionPerformed(null);
     }
     
+    /**
+     * Starts a thread to maintain a piped connection with the processor's
+     * output stream
+     */
     private void startPipeThread() {
         Thread streamPipeReaderThread = new Thread(new Runnable() {
             @Override
@@ -107,10 +111,21 @@ public class Main extends javax.swing.JFrame {
         streamPipeReaderThread.start();
     }
     
+    /**
+     * Directly sets the progress of the progress bar
+     * 
+     * @param progress Progress of an execution from 0-100
+     */
     public static void setProgress(int progress) {
         progressBar.setValue(progress);
     }
     
+    /**
+     * Calculates and updates the progress of the progress bar
+     * 
+     * @param value The current value of progress
+     * @param maximum The maximum value progress can reach
+     */
     public static void updateProgress(int value, int maximum) {
         float progress = ((float)value/maximum)*100f;
         progressBar.setValue((int)progress);
@@ -443,6 +458,12 @@ public class Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Generates a simple internal and temporary JTextPane with item information
+     * and attempts to print it
+     * 
+     * @param evt 
+     */
     private void button_printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_printActionPerformed
         itemCTM.clearTable();
 
@@ -466,6 +487,11 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_button_printActionPerformed
 
+    /**
+     * Adds a File to the planogram list model and parses it
+     * 
+     * @param f The File to add/parse
+     */
     private void addFileToPlanogramList(File f) {
         System.out.println("Attempting to parse " + f.getAbsolutePath());
         processor.startParsing(f, () -> {
@@ -477,6 +503,11 @@ public class Main extends javax.swing.JFrame {
         textField_input.requestFocus();
     }
     
+    /**
+     * Opens a file chooser window allowing for selection of pdf files
+     * 
+     * @param evt 
+     */
     private void button_uploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_uploadActionPerformed
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -500,6 +531,11 @@ public class Main extends javax.swing.JFrame {
         textField_input.selectAll();
     }//GEN-LAST:event_textField_inputActionPerformed
 
+    /**
+     * Queries the backend processor for results and updates the view accordingly
+     * 
+     * @param evt 
+     */
     private void button_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_searchActionPerformed
         int selectionIndex = comboBox_searchType.getSelectedIndex();
         String selection = comboBox_searchType.getItemAt(selectionIndex);
@@ -515,11 +551,14 @@ public class Main extends javax.swing.JFrame {
         
         if(itemsFound == null) return;
 
+        //clear the table, keeping selected items
         itemCTM.clearTable();
 
+        //add all items found to the table
         for(Item i : itemsFound)
             itemCTM.addItem(i);
 
+        //update the table (force redraw)
         itemCTM.updateTable();
 
         textField_input.selectAll();
@@ -530,10 +569,20 @@ public class Main extends javax.swing.JFrame {
         button_uploadActionPerformed(null);
     }//GEN-LAST:event_menuItem_uploadActionPerformed
 
+    /**
+     * Exits the program cleanly
+     * 
+     * @param evt 
+     */
     private void menuItem_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_exitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_menuItem_exitActionPerformed
 
+    /**
+     * Opens the about window
+     * 
+     * @param evt 
+     */
     private void menuItem_aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_aboutActionPerformed
         StringBuilder sb = new StringBuilder();
         sb.append(Launcher.APP_ARTIFACTID);
@@ -549,6 +598,11 @@ public class Main extends javax.swing.JFrame {
                 null, new Object[]{}, null);
     }//GEN-LAST:event_menuItem_aboutActionPerformed
 
+    /**
+     * Opens the default browser and navigates to this GitHub repository
+     * 
+     * @param evt 
+     */
     private void menuItem_githubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_githubActionPerformed
         try {
             Desktop.getDesktop().browse(new URI("https://github.com/ShermanZero/PlanogramHelper"));
@@ -557,11 +611,21 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_menuItem_githubActionPerformed
 
+    /**
+     * Shows/hides the developer console and resets the view (via packing)
+     * 
+     * @param evt 
+     */
     private void checkBoxMenuItem_developerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxMenuItem_developerActionPerformed
         scrollPane_textArea_output.setVisible(!scrollPane_textArea_output.isVisible());
         this.pack();
     }//GEN-LAST:event_checkBoxMenuItem_developerActionPerformed
 
+    /**
+     * Opens the settings UI
+     * 
+     * @param evt 
+     */
     private void menuItem_settingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_settingsActionPerformed
         JFrame parentWindow = this;
         
@@ -572,6 +636,12 @@ public class Main extends javax.swing.JFrame {
         });
     }//GEN-LAST:event_menuItem_settingsActionPerformed
 
+    /**
+     * Clears/resets the view model and backend-data, and re-processes all defined
+     * planograms
+     * 
+     * @param evt 
+     */
     private void menuItem_reuploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_reuploadActionPerformed
         processor.reset();
         itemCTM.setRowCount(0);
