@@ -27,6 +27,7 @@ public class Settings extends javax.swing.JFrame {
      */
     public Settings(Component parent) {
         setLocationRelativeTo(parent);
+        setAlwaysOnTop(true);
         
         initComponents();
         init();
