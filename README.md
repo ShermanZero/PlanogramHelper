@@ -2,7 +2,7 @@
 
 Hey there someone who probably could hire me, let me tell you why you *should*:
 
-![image](https://user-images.githubusercontent.com/16752746/187807356-41a5225e-439b-4fe6-a0f6-f7cb3a09d6bb.png)
+![image](https://user-images.githubusercontent.com/16752746/188516429-61b3ae2d-2b4c-4f73-a2b4-0bd276f883be.png)
 
 ### What does it do?
 Makes life easier for everyone!  (Finds any product in a planogram)
