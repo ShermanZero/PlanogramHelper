@@ -73,7 +73,11 @@ public class Main extends javax.swing.JFrame {
         if(Launcher.APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH)
             menuItem_pullFromDatabaseActionPerformed(null);
         
-        panel_developer.setEnabled(Boolean.parseBoolean(System.getProperty("dev")));
+        panel_developer.setVisible(false);
+        
+        checkBoxMenuItem_developer.setEnabled(Boolean.parseBoolean(System.getProperty("dev")));
+        
+        pack();
     }
     
     /**
