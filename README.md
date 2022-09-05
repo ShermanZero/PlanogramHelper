@@ -57,6 +57,12 @@ Absolutely!  Even in its current state it is very powerful, although there are m
 ### What additions would you add?
 For starters, I would absolutely be running a database server on the backend that the frontend can pull from.  Since product information seems to be pretty immutable, a SQL database would make sense, but I do love a NoSQL database like Mongo.  Either way, a database that stores all this information fetch-able through as-needed frontend update prompts would save lots of resource/processing power and ensure all distributions are synchronized.  It wouldn't surprise me if this database already exists, even if it's just an uncomfortably large excel spreadsheet, but imagine the possibilities of a hosted database.  For enders, that's about it.  There are bugs that need to be fixed (like being allowed to open multiple settings screens), but the largest and most significant change would be a program that doesn't have to use all 2kb of memory on our old computers to parse through a pdf.
 
+### What people are saying
+- > "Truly an incredible masterpiece :tada:" ~Kieran Skvortsov (me)
+- > "You need to be paid more" ~Dylan Pritchard (current coworker)
+- > "Megan agrees you need to be paid more" ~Dylan Pritchard (still a current coworker, referencing his wife Megan)
+- > "That's honestly the best thing omg!" ~Sici Khars (former managerial coworker)
+
 ### How do I contact you?
 Well, if you're from KinneyDrugs®, you probably already know how since I brought you here.  Otherwise, add me on Discord kieran#6425, or reach me at my professional email found in my GitHub profile.
 
