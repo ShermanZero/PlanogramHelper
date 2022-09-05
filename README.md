@@ -29,6 +29,12 @@ Well then you should stop wasting your time reading this and look through the re
 - Did I also mention that thread also has custom piped input/output streams for the in-app toggleable developer console?
 - Did I also also mention - oh it doesn't matter, there are many different advanced techniques used in this program to showcase my expertise.  Please look around and enjoy the thoroughly documented classes.  **I would start [here](src/main/java/pf/Processor.java) at the heart of the beast.**
 
+### New to 0.3.0+
+- Remote database fetching!
+  - Now can pull (automatically on startup if desired, and manually) from a MongoDB database.
+  - User access is read-only!
+  - Developer console was updated to include "RESET" and "PUBLISH" buttons, but this will not work on machines except mine unless you can somehow figure out how to launch the .jar with the correct authorization/access tokens which allow the MongoDB driver to connect to my administrator account.
+
 ----
 
 *And it all comes together cleanly, quickly, and presentably to allow you to do this in under 30 seconds:*
