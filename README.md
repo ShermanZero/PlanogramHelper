@@ -34,6 +34,7 @@ Well then you should stop wasting your time reading this and look through the re
   - Now can pull (automatically on startup if desired, and manually) from a MongoDB database.
   - User access is read-only!
   - Developer console was updated to include "RESET" and "PUBLISH" buttons, but this will not work on machines except mine unless you can somehow figure out how to launch the .jar with the correct authorization/access tokens which allow the MongoDB driver to connect to my administrator account.
+  - Developer console is disabled by default, but you can give yourself dev permissions by running the .jar with `-Ddev=true` e.g. `java -Ddev=true -jar PlanogramHelper.jar`
 
 ----
 
