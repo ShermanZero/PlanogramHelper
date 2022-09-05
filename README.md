@@ -37,7 +37,7 @@ Well then you should stop wasting your time reading this and look through the re
 
 ----
 
-*And it all comes together cleanly, quickly, and presentably to allow you to do this in under 30 seconds:*
+*It all comes together cleanly, quickly, and presentably to allow you to do this in under 30 seconds:*
 
 ![image](https://user-images.githubusercontent.com/16752746/187807590-eaf35a17-a683-4670-b1d5-6581f985afc5.png)
 
