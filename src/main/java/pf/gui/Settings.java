@@ -15,7 +15,7 @@ import pf.Launcher;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class Settings extends javax.swing.JFrame {
 
@@ -41,14 +41,17 @@ public class Settings extends javax.swing.JFrame {
         boolean uploadOnLaunch = Launcher.APP_UPLOAD_PLANOGRAMS_ON_LAUNCH;
         checkBox_uploadOnLaunch.setSelected(uploadOnLaunch);
         
+        boolean downloadOnLaunch = Launcher.APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH;
+        checkBox_downloadOnLaunch.setSelected(downloadOnLaunch);
+        
         list_planograms.setModel(dlm_planogram);
         
         String planogramString = Launcher.APP_PLANOGRAMS;
-        if(planogramString == null || planogramString.isEmpty() || planogramString.isBlank()) return;
+        if(planogramString == null || planogramString.isEmpty()) return;
         
         String[] planogramList = planogramString.split(",");
         for(String p : planogramList)
-            if(!p.isBlank() && !p.isEmpty()) {
+            if(p != null && !p.isEmpty()) {
                 planograms.add(p);
                 dlm_planogram.add(0, p);
             }
@@ -66,6 +69,7 @@ public class Settings extends javax.swing.JFrame {
     private void initComponents() {
 
         checkBox_uploadOnLaunch = new javax.swing.JCheckBox();
+        checkBox_downloadOnLaunch = new javax.swing.JCheckBox();
         scrollPane_list_planograms = new javax.swing.JScrollPane();
         list_planograms = new javax.swing.JList<>();
         button_add = new javax.swing.JButton();
@@ -76,8 +80,9 @@ public class Settings extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings");
 
-        checkBox_uploadOnLaunch.setSelected(true);
-        checkBox_uploadOnLaunch.setText("Upload Planograms on Launch");
+        checkBox_uploadOnLaunch.setText("Upload Local Planograms on Launch");
+
+        checkBox_downloadOnLaunch.setText("Download Remote Planograms on Launch");
 
         list_planograms.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -108,7 +113,7 @@ public class Settings extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("Planograms");
+        jLabel1.setText("Local Planograms");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -123,11 +128,13 @@ public class Settings extends javax.swing.JFrame {
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(button_add, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(button_remove, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)))
+                            .addComponent(button_remove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(button_add, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(checkBox_uploadOnLaunch)
-                        .addGap(74, 74, 74)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(checkBox_uploadOnLaunch)
+                            .addComponent(checkBox_downloadOnLaunch))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(button_apply, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -139,17 +146,22 @@ public class Settings extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(button_add)
+                        .addComponent(button_add, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(button_remove)
+                        .addComponent(button_remove, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(scrollPane_list_planograms, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))
-                .addGap(54, 54, 54))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(checkBox_uploadOnLaunch))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(button_apply, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(6, 6, 6))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(button_apply)
-                    .addComponent(checkBox_uploadOnLaunch))
+                .addComponent(checkBox_downloadOnLaunch, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -163,6 +175,8 @@ public class Settings extends javax.swing.JFrame {
      */
     private void button_applyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_applyActionPerformed
         boolean uploadOnLaunch = checkBox_uploadOnLaunch.isSelected();
+        boolean downloadOnLaunch = checkBox_downloadOnLaunch.isSelected();
+        
         StringBuilder sb = new StringBuilder();
         
         planograms.stream().forEach(p -> {
@@ -170,7 +184,7 @@ public class Settings extends javax.swing.JFrame {
             sb.append(",");
         });
         
-        Launcher.writeProperties(uploadOnLaunch, sb.toString());
+        Launcher.writeProperties(uploadOnLaunch, downloadOnLaunch, sb.toString());
         
         this.dispose();
     }//GEN-LAST:event_button_applyActionPerformed
@@ -215,6 +229,7 @@ public class Settings extends javax.swing.JFrame {
     private javax.swing.JButton button_add;
     private javax.swing.JButton button_apply;
     private javax.swing.JButton button_remove;
+    private javax.swing.JCheckBox checkBox_downloadOnLaunch;
     private javax.swing.JCheckBox checkBox_uploadOnLaunch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList<String> list_planograms;

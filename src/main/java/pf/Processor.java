@@ -20,14 +20,35 @@ import org.apache.pdfbox.text.PDFTextStripper;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class Processor {
     
+    public enum SearchType {
+        UPC, SKU, WORD;
+    }
+    
     private PipedOutputStream outputStream;
+    
+    //regex pattern that matches how products are listed
+    private final String REGEX_PRODUCT = "(?<POSITION>\\d+)\\s(?<SKU>\\d+)"
+            + "\\s(?=.*[a-zA-Z])(?<DESCRIPTION>(?:.*(?!\\d+\\W))*)\\s(?<UPC>\\d*)"
+            + "\\s(?<FACINGS>\\d)\\s*(?<NEW>\\bNEW\\b){0,1}\\n*";
+    
+    //regex pattern that matches how locations are listed
+    private final String REGEX_LOCATION = "(?:Fixture)\\s(?:(?!\\d).)*"
+            + "(?<FIXTURE>(?:\\w|[.])*)\\s(?:Name)\\s(?<NAME>.*)";
+    
+    //an arraylist to hold individual item objects
+    private PlanogramHandler planogramHandler = new PlanogramHandler();
+    private ArrayList<Item> itemsFound = new ArrayList<>();
+    
+    private MongoDBConnection mongoDBConnection;
     
     public Processor(PipedInputStream inputStream) {
         bindPipe(inputStream);
+        
+        mongoDBConnection = new MongoDBConnection();
     }
     
     public void bindPipe(PipedInputStream inputStream) {
@@ -50,22 +71,23 @@ public class Processor {
         System.setOut(new PrintStream(outputStream));
     }
     
-    public enum SearchType {
-        UPC, SKU, WORD;
+    public ArrayList<Item> getAllItems() {
+        return planogramHandler.getAllItems();
     }
     
-    //regex pattern that matches how products are listed
-    private final String REGEX_PRODUCT = "(?<POSITION>\\d+)\\s(?<SKU>\\d+)"
-            + "\\s(?=.*[a-zA-Z])(?<DESCRIPTION>(?:.*(?!\\d+\\W))*)\\s(?<UPC>\\d*)"
-            + "\\s(?<FACINGS>\\d)\\s*(?<NEW>\\bNEW\\b){0,1}\\n*";
+    public void resetMongoDB() {
+        mongoDBConnection.deleteAll();
+    }
     
-    //regex pattern that matches how locations are listed
-    private final String REGEX_LOCATION = "(?:Fixture)\\s(?:(?!\\d).)*"
-            + "(?<FIXTURE>(?:\\w|[.])*)\\s(?:Name)\\s(?<NAME>.*)";
+    public void uploadItemsToMongoDB() {
+        mongoDBConnection.uploadItems(planogramHandler.getAllItems());
+    }
     
-    //an arraylist to hold individual item objects
-    private PlanogramHandler planogramHandler = new PlanogramHandler();
-    private ArrayList<Item> itemsFound = new ArrayList<>();
+    public ArrayList<Item> pullFromMongoDB() {
+        ArrayList<Item> allItems = mongoDBConnection.pullAllItems();
+        createNewPlanogram("Master Database", allItems);
+        return allItems;
+    }
     
     public void startParsing(File file, Runnable callback) {
         Thread parsingThread = new Thread(new Runnable() {
@@ -198,15 +220,21 @@ public class Processor {
             System.out.println(String.format("[%d] items parsed from [%d] pages", 
                     tempItems.size(), pageStrings.length));
             
-            Planogram p = new Planogram(file.getAbsolutePath());
-            p.addItems(tempItems);
-            
-            planogramHandler.add(p);
+            createNewPlanogram(file.getAbsolutePath(), tempItems);
         }
         
         //update the progress bar in the UI
         Main.setProgress(0);
         return true;
+    }
+    
+    private Planogram createNewPlanogram(String name, ArrayList<Item> items) {
+        Planogram p = new Planogram(name);
+        p.addItems(items);
+        
+        planogramHandler.add(p);
+        
+        return p;
     }
     
     /**
@@ -249,9 +277,8 @@ public class Processor {
             );
         } else {
             System.out.println(
-                String.format("Search results returned %d item(s) with %s",
-                itemsFound.size(),
-                query)
+                String.format("Search results returned %d item(s)",
+                itemsFound.size())
             );
         }
         

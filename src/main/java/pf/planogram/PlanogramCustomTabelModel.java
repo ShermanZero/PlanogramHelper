@@ -7,7 +7,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class PlanogramCustomTabelModel extends DefaultTableModel {
     
@@ -23,6 +23,10 @@ public class PlanogramCustomTabelModel extends DefaultTableModel {
      */
     public void addPlanogram(File f) {
         super.addRow(new Object[] {true, f.getAbsolutePath()});
+    }
+    
+    public void addPlanogram(String name) {
+        super.addRow(new Object[] {true, name});
     }
     
     // Forcing column 0 to be boolean and represented with a checkbox

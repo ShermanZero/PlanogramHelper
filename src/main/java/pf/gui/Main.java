@@ -25,7 +25,7 @@ import pf.Launcher;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class Main extends javax.swing.JFrame {
     
@@ -34,6 +34,8 @@ public class Main extends javax.swing.JFrame {
     
     private static ItemCustomTableModel itemCTM = new ItemCustomTableModel();
     private static PlanogramCustomTabelModel planogramCTM = new PlanogramCustomTabelModel();
+    
+    private static Settings settings;
     
     /**
      * Creates new form UI
@@ -60,8 +62,6 @@ public class Main extends javax.swing.JFrame {
         table_planograms.getColumnModel().getColumn(0).setPreferredWidth(60);
         table_planograms.getColumnModel().getColumn(1).setPreferredWidth(390);
         
-        scrollPane_textArea_output.setVisible(checkBoxMenuItem_developer.isSelected());
-        
         this.setTitle(Launcher.APP_ARTIFACTID);
         this.pack();
         
@@ -69,6 +69,11 @@ public class Main extends javax.swing.JFrame {
         
         if(Launcher.APP_UPLOAD_PLANOGRAMS_ON_LAUNCH)
             menuItem_reuploadActionPerformed(null);
+        
+        if(Launcher.APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH)
+            menuItem_pullFromDatabaseActionPerformed(null);
+        
+        panel_developer.setEnabled(Boolean.parseBoolean(System.getProperty("dev")));
     }
     
     /**
@@ -141,24 +146,28 @@ public class Main extends javax.swing.JFrame {
     private void initComponents() {
 
         panel_main = new javax.swing.JPanel();
+        scrollPaneItemTable = new javax.swing.JScrollPane();
+        table_items = new javax.swing.JTable();
+        panel_developer = new javax.swing.JPanel();
         scrollPane_textArea_output = new javax.swing.JScrollPane();
         textArea_output = new javax.swing.JTextArea();
+        button_publish = new javax.swing.JButton();
+        button_reset = new javax.swing.JButton();
         panelGroupBottom = new javax.swing.JPanel();
         textField_input = new javax.swing.JTextField();
         comboBox_searchType = new javax.swing.JComboBox<>();
         button_search = new javax.swing.JButton();
         button_clear = new javax.swing.JButton();
-        scrollPaneItemTable = new javax.swing.JScrollPane();
-        table_items = new javax.swing.JTable();
-        button_upload = new javax.swing.JButton();
-        button_print = new javax.swing.JButton();
         scrollPane_table_planograms = new javax.swing.JScrollPane();
         table_planograms = new javax.swing.JTable();
         progressBar = new javax.swing.JProgressBar();
+        button_upload = new javax.swing.JButton();
+        button_print = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
         menuItem_upload = new javax.swing.JMenuItem();
         menuItem_reupload = new javax.swing.JMenuItem();
+        menuItem_pullFromDatabase = new javax.swing.JMenuItem();
         menuItem_print = new javax.swing.JMenuItem();
         separator01 = new javax.swing.JPopupMenu.Separator();
         menuItem_checkForUpdates = new javax.swing.JMenuItem();
@@ -175,12 +184,103 @@ public class Main extends javax.swing.JFrame {
         setName("frameMain"); // NOI18N
         setResizable(false);
 
+        scrollPaneItemTable.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        table_items.setFont(new java.awt.Font("Monospaced", 1, 12)); // NOI18N
+        table_items.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Print", "UPC", "SKU", "Description", "Fixture", "Name"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Boolean.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        table_items.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        table_items.setGridColor(new java.awt.Color(51, 51, 51));
+        table_items.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        table_items.setShowGrid(true);
+        table_items.setShowVerticalLines(false);
+        scrollPaneItemTable.setViewportView(table_items);
+
+        panel_developer.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
         textArea_output.setEditable(false);
         textArea_output.setBackground(new java.awt.Color(51, 51, 51));
         textArea_output.setColumns(20);
         textArea_output.setFont(new java.awt.Font("Cascadia Code", 0, 12)); // NOI18N
         textArea_output.setRows(5);
         scrollPane_textArea_output.setViewportView(textArea_output);
+
+        button_publish.setBackground(new java.awt.Color(153, 153, 153));
+        button_publish.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        button_publish.setForeground(new java.awt.Color(51, 51, 51));
+        button_publish.setText("PUBLISH");
+        button_publish.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button_publish.setMaximumSize(new java.awt.Dimension(26, 26));
+        button_publish.setMinimumSize(new java.awt.Dimension(26, 26));
+        button_publish.setPreferredSize(new java.awt.Dimension(26, 26));
+        button_publish.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_publishActionPerformed(evt);
+            }
+        });
+
+        button_reset.setBackground(new java.awt.Color(115, 72, 72));
+        button_reset.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        button_reset.setForeground(new java.awt.Color(204, 204, 204));
+        button_reset.setText("RESET");
+        button_reset.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button_reset.setMaximumSize(new java.awt.Dimension(26, 26));
+        button_reset.setMinimumSize(new java.awt.Dimension(26, 26));
+        button_reset.setPreferredSize(new java.awt.Dimension(26, 26));
+        button_reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_resetActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_developerLayout = new javax.swing.GroupLayout(panel_developer);
+        panel_developer.setLayout(panel_developerLayout);
+        panel_developerLayout.setHorizontalGroup(
+            panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_developerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrollPane_textArea_output)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(button_publish, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+                    .addComponent(button_reset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panel_developerLayout.setVerticalGroup(
+            panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_developerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_developerLayout.createSequentialGroup()
+                        .addComponent(button_publish, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(59, 59, 59))
+                    .addGroup(panel_developerLayout.createSequentialGroup()
+                        .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(scrollPane_textArea_output, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(button_reset, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())))
+        );
 
         panelGroupBottom.setBackground(new java.awt.Color(51, 51, 51));
         panelGroupBottom.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
@@ -245,38 +345,23 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        scrollPaneItemTable.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        table_items.setFont(new java.awt.Font("Monospaced", 1, 12)); // NOI18N
-        table_items.setModel(new javax.swing.table.DefaultTableModel(
+        table_planograms.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null}
+                {null, null}
             },
             new String [] {
-                "Print", "UPC", "SKU", "Description", "Fixture", "Name"
+                "Include", "Planogram"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Boolean.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                true, false, false, false, false, false
+                java.lang.Boolean.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
         });
-        table_items.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        table_items.setGridColor(new java.awt.Color(51, 51, 51));
-        table_items.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        table_items.setShowGrid(true);
-        table_items.setShowVerticalLines(false);
-        scrollPaneItemTable.setViewportView(table_items);
+        scrollPane_table_planograms.setViewportView(table_planograms);
 
         button_upload.setBackground(new java.awt.Color(153, 153, 153));
         button_upload.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -304,24 +389,6 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        table_planograms.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null}
-            },
-            new String [] {
-                "Include", "Planogram"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Boolean.class, java.lang.String.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        scrollPane_table_planograms.setViewportView(table_planograms);
-
         javax.swing.GroupLayout panel_mainLayout = new javax.swing.GroupLayout(panel_main);
         panel_main.setLayout(panel_mainLayout);
         panel_mainLayout.setHorizontalGroup(
@@ -330,33 +397,43 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_mainLayout.createSequentialGroup()
-                        .addComponent(panelGroupBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(4, 4, 4)
-                        .addComponent(scrollPane_table_planograms, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(button_upload, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(button_print, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                    .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(scrollPane_textArea_output, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6))
+                            .addGroup(panel_mainLayout.createSequentialGroup()
+                                .addComponent(panelGroupBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(4, 4, 4)
+                                .addComponent(scrollPane_table_planograms, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(panel_mainLayout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(button_print, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_mainLayout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(button_upload, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(panel_mainLayout.createSequentialGroup()
+                                .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(6, 6, 6))
+                    .addGroup(panel_mainLayout.createSequentialGroup()
+                        .addComponent(panel_developer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         panel_mainLayout.setVerticalGroup(
             panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_mainLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPane_textArea_output, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panel_developer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panel_mainLayout.createSequentialGroup()
                         .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(button_upload, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(button_upload, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(button_print, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(button_print, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(panelGroupBottom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(scrollPane_table_planograms, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
@@ -381,6 +458,15 @@ public class Main extends javax.swing.JFrame {
             }
         });
         menu_file.add(menuItem_reupload);
+
+        menuItem_pullFromDatabase.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_pullFromDatabase.setText("Pull from Database");
+        menuItem_pullFromDatabase.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_pullFromDatabaseActionPerformed(evt);
+            }
+        });
+        menu_file.add(menuItem_pullFromDatabase);
 
         menuItem_print.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItem_print.setText("Print Selection");
@@ -465,7 +551,7 @@ public class Main extends javax.swing.JFrame {
      * @param evt 
      */
     private void button_printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_printActionPerformed
-        itemCTM.clearTable();
+        itemCTM.clearTable(true);
 
         if(itemCTM.getItemsKept().isEmpty()) {
             System.out.println("Nothing selected to print");
@@ -523,7 +609,7 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_button_uploadActionPerformed
 
     private void button_clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_clearActionPerformed
-        itemCTM.clearTable();
+        itemCTM.clearTable(false);
     }//GEN-LAST:event_button_clearActionPerformed
 
     private void textField_inputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField_inputActionPerformed
@@ -552,7 +638,7 @@ public class Main extends javax.swing.JFrame {
         if(itemsFound == null) return;
 
         //clear the table, keeping selected items
-        itemCTM.clearTable();
+        itemCTM.clearTable(true);
 
         //add all items found to the table
         for(Item i : itemsFound)
@@ -617,7 +703,7 @@ public class Main extends javax.swing.JFrame {
      * @param evt 
      */
     private void checkBoxMenuItem_developerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxMenuItem_developerActionPerformed
-        scrollPane_textArea_output.setVisible(!scrollPane_textArea_output.isVisible());
+        panel_developer.setVisible(!panel_developer.isVisible());
         this.pack();
     }//GEN-LAST:event_checkBoxMenuItem_developerActionPerformed
 
@@ -631,7 +717,12 @@ public class Main extends javax.swing.JFrame {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Settings(parentWindow).setVisible(true);
+                if(settings != null) {
+                    settings.dispose();
+                }
+                
+                settings = new Settings(parentWindow);
+                settings.setVisible(true);
             }
         });
     }//GEN-LAST:event_menuItem_settingsActionPerformed
@@ -643,12 +734,10 @@ public class Main extends javax.swing.JFrame {
      * @param evt 
      */
     private void menuItem_reuploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_reuploadActionPerformed
-        processor.reset();
-        itemCTM.setRowCount(0);
-        planogramCTM.setRowCount(0);
+        resetUI();
         
         String planogramString = Launcher.APP_PLANOGRAMS;
-        if(planogramString.isBlank() || planogramString.isEmpty()) return;
+        if(planogramString.isEmpty()) return;
         
         String[] planograms = planogramString.split(",");
         
@@ -661,10 +750,38 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_menuItem_reuploadActionPerformed
 
+    private void button_publishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_publishActionPerformed
+        processor.uploadItemsToMongoDB();
+    }//GEN-LAST:event_button_publishActionPerformed
+
+    private void menuItem_pullFromDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_pullFromDatabaseActionPerformed
+        resetUI();
+        
+        processor.pullFromMongoDB().forEach(i -> {
+            itemCTM.addItem(i);
+        });
+        itemCTM.updateTable();
+        
+        planogramCTM.addPlanogram("Master Database");
+        planogramCTM.updateTable();
+    }//GEN-LAST:event_menuItem_pullFromDatabaseActionPerformed
+
+    private void button_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_resetActionPerformed
+        processor.resetMongoDB();
+    }//GEN-LAST:event_button_resetActionPerformed
+
+    
+    private void resetUI() {
+        processor.reset();
+        itemCTM.clearTable(false);
+        planogramCTM.setRowCount(0);
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_clear;
     private javax.swing.JButton button_print;
+    private javax.swing.JButton button_publish;
+    private javax.swing.JButton button_reset;
     private javax.swing.JButton button_search;
     private javax.swing.JButton button_upload;
     private javax.swing.JCheckBoxMenuItem checkBoxMenuItem_developer;
@@ -675,12 +792,14 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem_exit;
     private javax.swing.JMenuItem menuItem_github;
     private javax.swing.JMenuItem menuItem_print;
+    private javax.swing.JMenuItem menuItem_pullFromDatabase;
     private javax.swing.JMenuItem menuItem_reupload;
     private javax.swing.JMenuItem menuItem_settings;
     private javax.swing.JMenuItem menuItem_upload;
     private javax.swing.JMenu menu_file;
     private javax.swing.JMenu menu_view;
     private javax.swing.JPanel panelGroupBottom;
+    private javax.swing.JPanel panel_developer;
     private javax.swing.JPanel panel_main;
     private static javax.swing.JProgressBar progressBar;
     private javax.swing.JScrollPane scrollPaneItemTable;

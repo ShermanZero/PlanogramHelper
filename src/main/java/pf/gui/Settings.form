@@ -34,13 +34,16 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="button_remove" max="32767" attributes="0"/>
                           <Component id="button_add" max="32767" attributes="0"/>
-                          <Component id="button_remove" alignment="1" pref="128" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" attributes="0">
-                      <Component id="checkBox_uploadOnLaunch" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="checkBox_uploadOnLaunch" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkBox_downloadOnLaunch" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="button_apply" pref="128" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -56,21 +59,28 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="button_add" min="-2" max="-2" attributes="0"/>
+                      <Component id="button_add" min="-2" pref="42" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="button_remove" min="-2" max="-2" attributes="0"/>
+                      <Component id="button_remove" min="-2" pref="42" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <Component id="scrollPane_list_planograms" pref="218" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="checkBox_uploadOnLaunch" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="button_apply" min="-2" pref="42" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="button_apply" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="checkBox_uploadOnLaunch" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="checkBox_downloadOnLaunch" min="-2" pref="22" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -79,8 +89,12 @@
   <SubComponents>
     <Component class="javax.swing.JCheckBox" name="checkBox_uploadOnLaunch">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
-        <Property name="text" type="java.lang.String" value="Upload Planograms on Launch"/>
+        <Property name="text" type="java.lang.String" value="Upload Local Planograms on Launch"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="checkBox_downloadOnLaunch">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Download Remote Planograms on Launch"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="scrollPane_list_planograms">
@@ -135,7 +149,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Planograms"/>
+        <Property name="text" type="java.lang.String" value="Local Planograms"/>
       </Properties>
     </Component>
   </SubComponents>

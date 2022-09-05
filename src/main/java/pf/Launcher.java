@@ -12,7 +12,7 @@ import pf.gui.Main;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  * 
  * Main class and backbone
  */
@@ -24,6 +24,7 @@ public class Launcher {
     public static String APP_ARTIFACTID;
     public static String APP_VERSION;
     public static boolean APP_UPLOAD_PLANOGRAMS_ON_LAUNCH;
+    public static boolean APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH;
     public static String APP_PLANOGRAMS;
     
     /**
@@ -55,6 +56,9 @@ public class Launcher {
             APP_UPLOAD_PLANOGRAMS_ON_LAUNCH = Boolean.parseBoolean(
                     props_local.getProperty("uploadPlanogramsOnLaunch")
                 );
+            APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH = Boolean.parseBoolean(
+                    props_local.getProperty("downloadPlanogramsOnLaunch")
+                );
             APP_PLANOGRAMS = props_local.getProperty("planograms");
         }
         
@@ -79,14 +83,20 @@ public class Launcher {
      * Writes out the two properties modifiable in the settings window
      * 
      * @param uploadOnLaunch Whether or not to automatically upload planograms on launch
+     * @param downloadOnLaunch Whether or not to automatically download planograms on launch
      * @param planograms List of absolute paths to planogram pdf files
      */
-    public static void writeProperties(boolean uploadOnLaunch, String planograms) {
+    public static void writeProperties(boolean uploadOnLaunch, boolean downloadOnLaunch, String planograms) {
         APP_UPLOAD_PLANOGRAMS_ON_LAUNCH = uploadOnLaunch;
+        APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH = downloadOnLaunch;
         APP_PLANOGRAMS = planograms;
         
         props_local.setProperty("uploadPlanogramsOnLaunch", 
                 Boolean.toString(APP_UPLOAD_PLANOGRAMS_ON_LAUNCH));
+        
+        props_local.setProperty("downloadPlanogramsOnLaunch", 
+                Boolean.toString(downloadOnLaunch));
+        
         props_local.setProperty("planograms", APP_PLANOGRAMS);
         
         FileOutputStream fos = null;

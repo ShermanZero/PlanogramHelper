@@ -7,7 +7,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class ItemCustomTableModel extends DefaultTableModel {
     
@@ -48,19 +48,23 @@ public class ItemCustomTableModel extends DefaultTableModel {
      * Clears the table but keeps any items selected
      * 
      */
-    public void clearTable() {
+    public void clearTable(boolean keepSelected) {
         itemsKeptSKUs.clear();
         
-        for(int i = 0; i < getRowCount(); ++i) {
-            boolean keep = (boolean)getValueAt(i, 0);
-            
-            if(keep) {
-                itemsKeptSKUs.add((String)getValueAt(i, 1));
-                continue;
+        if(!keepSelected) {
+            setRowCount(0);
+        } else {
+            for(int i = 0; i < getRowCount(); ++i) {
+                boolean keep = (boolean)getValueAt(i, 0);
+
+                if(keep) {
+                    itemsKeptSKUs.add((String)getValueAt(i, 1));
+                    continue;
+                }
+
+                removeRow(i);
+                --i;
             }
-            
-            removeRow(i);
-            --i;
         }
         
         updateTable();

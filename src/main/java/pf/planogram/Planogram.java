@@ -10,7 +10,7 @@ import pf.item.ItemHashMap;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class Planogram {
     
@@ -53,6 +53,16 @@ public class Planogram {
      */
     public ArrayList<Item> getItemsByQuery(String query, Processor.SearchType searchType) {
         return itemsInPlanogram.findByQuery(query, searchType);
+    }
+    
+    public ArrayList<Item> getAllItems() {
+        ArrayList<Item> items = new ArrayList<>();
+        
+        itemsInPlanogram.forEach((_sku,i) -> {
+            items.add(i);
+        });
+        
+        return items;
     }
     
     /**

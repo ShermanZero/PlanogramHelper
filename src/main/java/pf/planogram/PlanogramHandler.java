@@ -8,7 +8,7 @@ import pf.item.Item;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class PlanogramHandler extends ArrayList<Planogram> {
     
@@ -58,5 +58,15 @@ public class PlanogramHandler extends ArrayList<Planogram> {
         });
         
         return itemsFound;
+    }
+    
+    public ArrayList<Item> getAllItems() {
+        ArrayList<Item> items = new ArrayList<>();
+        
+        this.forEach(p -> {
+            items.addAll(p.getAllItems());
+        });
+        
+        return items;
     }
 }

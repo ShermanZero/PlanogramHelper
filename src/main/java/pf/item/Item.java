@@ -5,7 +5,7 @@ import pf.Processor.SearchType;
 /**
  *
  * @author      Kieran Skvortsov
- * @employee#   72141
+ * employee#   72141
  */
 public class Item {
     private final int position;
@@ -18,6 +18,15 @@ public class Item {
     private String fixture;
     private String name;
     
+    /**
+     * 
+     * @param position
+     * @param SKU
+     * @param description
+     * @param UPC
+     * @param facings
+     * @param isNew 
+     */
     public Item(int position, String SKU, String description, String UPC, int facings, boolean isNew) {
         this.position = position;
         this.SKU = SKU.trim();
