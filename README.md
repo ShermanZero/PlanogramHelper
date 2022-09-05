@@ -2,7 +2,7 @@
 
 Hey there someone who probably could hire me, let me tell you why you *should*:
 
-![image](https://user-images.githubusercontent.com/16752746/187807356-41a5225e-439b-4fe6-a0f6-f7cb3a09d6bb.png)
+![image](https://user-images.githubusercontent.com/16752746/188516429-61b3ae2d-2b4c-4f73-a2b4-0bd276f883be.png)
 
 ### What does it do?
 Makes life easier for everyone!  (Finds any product in a planogram)
@@ -29,9 +29,15 @@ Well then you should stop wasting your time reading this and look through the re
 - Did I also mention that thread also has custom piped input/output streams for the in-app toggleable developer console?
 - Did I also also mention - oh it doesn't matter, there are many different advanced techniques used in this program to showcase my expertise.  Please look around and enjoy the thoroughly documented classes.  **I would start [here](src/main/java/pf/Processor.java) at the heart of the beast.**
 
+### New to 0.3.0+
+- Remote database fetching!
+  - Now can pull (automatically on startup if desired, and manually) from a MongoDB database.
+  - User access is read-only!
+  - Developer console was updated to include "RESET" and "PUBLISH" buttons, but this will not work on machines except mine unless you can somehow figure out how to launch the .jar with the correct authorization/access tokens which allow the MongoDB driver to connect to my administrator account.
+
 ----
 
-*And it all comes together cleanly, quickly, and presentably to allow you to do this in under 30 seconds:*
+*It all comes together cleanly, quickly, and presentably to allow you to do this in under 30 seconds:*
 
 ![image](https://user-images.githubusercontent.com/16752746/187807590-eaf35a17-a683-4670-b1d5-6581f985afc5.png)
 
@@ -50,6 +56,12 @@ Absolutely!  Even in its current state it is very powerful, although there are m
 
 ### What additions would you add?
 For starters, I would absolutely be running a database server on the backend that the frontend can pull from.  Since product information seems to be pretty immutable, a SQL database would make sense, but I do love a NoSQL database like Mongo.  Either way, a database that stores all this information fetch-able through as-needed frontend update prompts would save lots of resource/processing power and ensure all distributions are synchronized.  It wouldn't surprise me if this database already exists, even if it's just an uncomfortably large excel spreadsheet, but imagine the possibilities of a hosted database.  For enders, that's about it.  There are bugs that need to be fixed (like being allowed to open multiple settings screens), but the largest and most significant change would be a program that doesn't have to use all 2kb of memory on our old computers to parse through a pdf.
+
+### What people are saying about PlanogramHelper
+- > "Truly an incredible masterpiece :tada:" ~Kieran (me)
+- > "You need to be paid more" ~Dylan (current coworker)
+- > "Megan agrees you need to be paid more" ~Dylan (still a current coworker, referencing his wife Megan)
+- > "That's honestly the best thing omg!" ~Sici (former managerial coworker)
 
 ### How do I contact you?
 Well, if you're from KinneyDrugs®, you probably already know how since I brought you here.  Otherwise, add me on Discord kieran#6425, or reach me at my professional email found in my GitHub profile.
