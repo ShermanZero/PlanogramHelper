@@ -21,29 +21,32 @@ import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import pf.Launcher;
+import pf.UserSettings;
 
 /**
  *
  * @author      Kieran Skvortsov
- * employee#   72141
+ * employee#    72141
  */
 public class Main extends javax.swing.JFrame {
     
     private static PipedInputStream inputStream = new PipedInputStream();
     private static Processor processor = new Processor(inputStream);
     
+    //custom models for tabels and how they display information
     private static ItemCustomTableModel itemCTM = new ItemCustomTableModel();
     private static PlanogramCustomTabelModel planogramCTM = new PlanogramCustomTabelModel();
     
+    //instance variable to reference settings to make sure only one Settings
+    //  window is open at any time
     private static Settings settings;
     
-    /**
-     * Creates new form UI
-     */
     public Main() {
         initComponents();
         setLocationRelativeTo(null);
 
+        //various initialization for the Item table
+        //TODO: move this somewhere else i.e. define it in a custom class
         table_items.setModel(itemCTM);
         table_items.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         
@@ -65,18 +68,26 @@ public class Main extends javax.swing.JFrame {
         this.setTitle(Launcher.APP_ARTIFACTID);
         this.pack();
         
+        //start the input/output piped connection for System::out
         startPipeThread();
         
-        if(Launcher.APP_UPLOAD_PLANOGRAMS_ON_LAUNCH)
+        //if startup settings say to upload local planograms
+        if(Boolean.parseBoolean(UserSettings.getProperty("startup.upload")))
             menuItem_reuploadActionPerformed(null);
         
-        if(Launcher.APP_DOWNLOAD_PLANOGRAMS_ON_LAUNCH)
+        //if startup settings say to download from database
+        if(Boolean.parseBoolean(UserSettings.getProperty("startup.download")))
             menuItem_pullFromDatabaseActionPerformed(null);
         
+        //hide the developer panel by default
         panel_developer.setVisible(false);
         
+        //enable the developer console for view if the program was run with the
+        //  dev system property
         checkBoxMenuItem_developer.setEnabled(Boolean.parseBoolean(System.getProperty("dev")));
         
+        //repack the UI so the JFrame updates the developer console is no longer
+        //  there and makes adjustments accordingly
         pack();
     }
     
@@ -88,7 +99,9 @@ public class Main extends javax.swing.JFrame {
         Thread streamPipeReaderThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                //run indefinitely
                 while(true) {
+                    //create a new input stream if null
                     if(inputStream != null) {
                         try {
                             int data;
@@ -97,22 +110,22 @@ public class Main extends javax.swing.JFrame {
                                 textArea_output.append(Character.toString((char)data));
                                 textArea_output.setCaretPosition(textArea_output.getText().length());
                             }
-                        } catch (IOException ex) {
-                            System.err.println(ex);
-                        }
+                        } catch (IOException ex) { System.err.println(ex); }
                     }
                     
                     try {
+                        //close and discard the inputstream
                         if(inputStream != null) {
                             inputStream.close();
                             inputStream = null;
                         }
                         
+                        //create a new input stream
                         inputStream = new PipedInputStream();
+                        
+                        //bind the new input stream to the processor
                         processor.bindPipe(inputStream);
-                    } catch (IOException ex) {
-                        System.err.println(ex);
-                    }
+                    } catch (IOException ex) { System.err.println(ex); }
                 }
             }
         });
@@ -406,14 +419,12 @@ public class Main extends javax.swing.JFrame {
                                 .addComponent(panelGroupBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(4, 4, 4)
                                 .addComponent(scrollPane_table_planograms, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panel_mainLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(button_print, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                                    .addComponent(button_print, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_mainLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGap(0, 0, Short.MAX_VALUE)
                                         .addComponent(button_upload, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(panel_mainLayout.createSequentialGroup()
                                 .addComponent(scrollPaneItemTable, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -478,6 +489,7 @@ public class Main extends javax.swing.JFrame {
         menu_file.add(separator01);
 
         menuItem_checkForUpdates.setText("Check for Updates");
+        menuItem_checkForUpdates.setEnabled(false);
         menu_file.add(menuItem_checkForUpdates);
 
         menuItem_github.setText("See on GitHub");
@@ -740,8 +752,9 @@ public class Main extends javax.swing.JFrame {
     private void menuItem_reuploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_reuploadActionPerformed
         resetUI();
         
-        String planogramString = Launcher.APP_PLANOGRAMS;
-        if(planogramString.isEmpty()) return;
+        //TODO: Fix breaking changes
+        String planogramString = null;
+        if(planogramString == null || planogramString.isEmpty()) return;
         
         String[] planograms = planogramString.split(",");
         
