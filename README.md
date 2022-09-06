@@ -29,6 +29,19 @@ Well then you should stop wasting your time reading this and look through the re
 - Did I also mention that thread also has custom piped input/output streams for the in-app toggleable developer console?
 - Did I also also mention - oh it doesn't matter, there are many different advanced techniques used in this program to showcase my expertise.  Please look around and enjoy the thoroughly documented classes.  **I would start [here](src/main/java/pf/Processor.java) at the heart of the beast.**
 
+----
+## Patch Notes
+
+### New to 0.3.1+
+- Settings rehaul!
+  - Custom authentication!
+    - Really only useful for me, but in the future, if any users are added to the database, you can now connect with your own credentials via the UI
+    - Warning: user authentication is saved locally as plaintext (I don't feel like setting up a MD5 hashing/verification procedure at the moment)
+
+#### Breaking Changes
+  - Local planograms are not saved in settings and will not upload automatically upon startup
+
+
 ### New to 0.3.0+
 - Remote database fetching!
   - Now can pull (automatically on startup if desired, and manually) from a MongoDB database.
