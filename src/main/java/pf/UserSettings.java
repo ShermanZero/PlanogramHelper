@@ -16,13 +16,16 @@ import pf.trackable.UnnamedException;
  */
 public final class UserSettings {
     
-    private final static Properties props_local = new Properties();
-    private final static ArrayList<Trackable> tracked = new ArrayList<>();
+    private static Properties props_local;
+    private static ArrayList<Trackable> tracked;
     
     private static boolean loaded = false;
     
     //Load the properties before anything else can happen
     static {
+        props_local = new Properties();
+        tracked = new ArrayList<>();
+        
         load();
     }
 
@@ -76,9 +79,10 @@ public final class UserSettings {
         if(localProps.exists()) {
             try {
                 props_local.load(new FileInputStream(localProps));
-                loaded = true;
-            } catch (IOException ex) { System.err.println(ex); }
+            } catch (IOException ex) { System.err.println(ex); return; }
         }
+        
+        loaded = true;
     }
     
     /**
@@ -90,8 +94,12 @@ public final class UserSettings {
         props_local.clear();
         
         //write each trackable component's name and its converted property value
-        tracked.forEach((trackable) -> {
-            props_local.put(trackable.getName(), trackable.wrapToProperty());
+        tracked.forEach((Trackable t) -> {
+            String name = t.getName();
+            String value = t.wrapToProperty();
+            
+            if(name != null && value != null)
+                props_local.put(name, value);
         });
         
         //clear the tracked components

@@ -28,6 +28,8 @@ public class TrackablePasswordField extends JPasswordField implements Trackable<
 
     @Override
     public String getValue() {
+        if(trackedValue == null) return null;
+        
         return new String(trackedValue);
     }
 
