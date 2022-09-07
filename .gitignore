@@ -1,7 +1,8 @@
-target/
-bin/
+#IGNORE
+/target/
 *.ser
 *.properties
 *.xml
 
-!target/site/apidocs/*
+#ALLOW
+!/target/site/apidocs/*
