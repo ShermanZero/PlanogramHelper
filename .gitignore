@@ -2,3 +2,5 @@ target/
 *.ser
 *.properties
 *.xml
+
+!target/site/apidocs/index.html
