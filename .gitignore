@@ -1,8 +1,8 @@
 #IGNORE
-target/
+/target/
 *.ser
 *.properties
 *.xml
 
 #ALLOW
-!target/site/apidocs/*
+!/target/site/apidocs/*
