@@ -1,5 +1,6 @@
 package pf.gui;
 
+import pf.gui.custom.trackable.UnnamedException;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import pf.UserSettings;
-import pf.trackable.UnnamedException;
 
 /**
  *
@@ -89,21 +89,22 @@ public class Settings extends javax.swing.JFrame {
         button_add = new javax.swing.JButton();
         button_remove = new javax.swing.JButton();
         panel_auth = new javax.swing.JPanel();
-        trackableCheckBox_customAuth = new pf.trackable.TrackableCheckBox();
+        trackableCheckBox_customAuth = new pf.gui.custom.trackable.TrackableCheckBox();
         label_username = new javax.swing.JLabel();
-        trackableTextField_username = new pf.trackable.TrackableTextField();
+        trackableTextField_username = new pf.gui.custom.trackable.TrackableTextField();
+        label_warning_1 = new javax.swing.JLabel();
         label_password = new javax.swing.JLabel();
-        trackablePasswordField_password = new pf.trackable.TrackablePasswordField();
-        label_warning = new javax.swing.JLabel();
-        label_warning1 = new javax.swing.JLabel();
+        trackablePasswordField_password = new pf.gui.custom.trackable.TrackablePasswordField();
+        label_warning_2 = new javax.swing.JLabel();
         panel_startup = new javax.swing.JPanel();
         label_startup = new javax.swing.JLabel();
-        trackableCheckBox_upload = new pf.trackable.TrackableCheckBox();
-        trackableCheckBox_download = new pf.trackable.TrackableCheckBox();
+        trackableCheckBox_upload = new pf.gui.custom.trackable.TrackableCheckBox();
+        trackableCheckBox_download = new pf.gui.custom.trackable.TrackableCheckBox();
         button_apply = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings");
+        setResizable(false);
 
         label_local.setText("Local Planograms");
 
@@ -163,25 +164,20 @@ public class Settings extends javax.swing.JFrame {
         tabbedPane.addTab("Local", panel_general);
 
         trackableCheckBox_customAuth.setText("Use Custom Authentication");
-        trackableCheckBox_customAuth.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                trackableCheckBox_customAuthActionPerformed(evt);
-            }
-        });
 
         label_username.setForeground(new java.awt.Color(153, 153, 153));
         label_username.setText("Username");
 
+        label_warning_1.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        label_warning_1.setForeground(new java.awt.Color(153, 153, 153));
+        label_warning_1.setText("Warning: saved locally as plaintext");
+
         label_password.setForeground(new java.awt.Color(153, 153, 153));
         label_password.setText("Password");
 
-        label_warning.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
-        label_warning.setForeground(new java.awt.Color(153, 153, 153));
-        label_warning.setText("Warning: saved locally as plaintext");
-
-        label_warning1.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
-        label_warning1.setForeground(new java.awt.Color(153, 153, 153));
-        label_warning1.setText("Warning: saved locally as plaintext");
+        label_warning_2.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        label_warning_2.setForeground(new java.awt.Color(153, 153, 153));
+        label_warning_2.setText("Warning: saved locally as plaintext");
 
         javax.swing.GroupLayout panel_authLayout = new javax.swing.GroupLayout(panel_auth);
         panel_auth.setLayout(panel_authLayout);
@@ -190,20 +186,20 @@ public class Settings extends javax.swing.JFrame {
             .addGroup(panel_authLayout.createSequentialGroup()
                 .addGroup(panel_authLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_authLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(trackableCheckBox_customAuth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_authLayout.createSequentialGroup()
                         .addGap(27, 27, 27)
                         .addGroup(panel_authLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(label_username)
                             .addComponent(label_password)
-                            .addComponent(trackableTextField_username, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(trackablePasswordField_password, javax.swing.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE))
+                            .addComponent(trackableTextField_username, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                            .addComponent(trackablePasswordField_password, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panel_authLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(label_warning)
-                            .addComponent(label_warning1))))
-                .addContainerGap(12, Short.MAX_VALUE))
+                            .addComponent(label_warning_1)
+                            .addComponent(label_warning_2)))
+                    .addGroup(panel_authLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(trackableCheckBox_customAuth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         panel_authLayout.setVerticalGroup(
             panel_authLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -214,14 +210,14 @@ public class Settings extends javax.swing.JFrame {
                 .addComponent(label_username)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_authLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(trackableTextField_username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label_warning))
+                    .addComponent(label_warning_1)
+                    .addComponent(trackableTextField_username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(label_password)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_authLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(trackablePasswordField_password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label_warning1))
+                    .addComponent(label_warning_2)
+                    .addComponent(trackablePasswordField_password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
 
@@ -231,7 +227,7 @@ public class Settings extends javax.swing.JFrame {
 
         trackableCheckBox_upload.setText("Upload Local Planograms");
 
-        trackableCheckBox_download.setText("Download Remote Planograms");
+        trackableCheckBox_download.setText("Download From Database");
 
         javax.swing.GroupLayout panel_startupLayout = new javax.swing.GroupLayout(panel_startup);
         panel_startup.setLayout(panel_startupLayout);
@@ -241,9 +237,12 @@ public class Settings extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panel_startupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(label_startup)
-                    .addComponent(trackableCheckBox_upload, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(trackableCheckBox_download, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(197, Short.MAX_VALUE))
+                    .addGroup(panel_startupLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(panel_startupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(trackableCheckBox_download, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(trackableCheckBox_upload, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(219, Short.MAX_VALUE))
         );
         panel_startupLayout.setVerticalGroup(
             panel_startupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -349,18 +348,18 @@ public class Settings extends javax.swing.JFrame {
     private javax.swing.JLabel label_password;
     private javax.swing.JLabel label_startup;
     private javax.swing.JLabel label_username;
-    private javax.swing.JLabel label_warning;
-    private javax.swing.JLabel label_warning1;
+    private javax.swing.JLabel label_warning_1;
+    private javax.swing.JLabel label_warning_2;
     private javax.swing.JList<String> list_planograms;
     private javax.swing.JPanel panel_auth;
     private javax.swing.JPanel panel_general;
     private javax.swing.JPanel panel_startup;
     private javax.swing.JScrollPane scrollPane_list_planograms;
     private javax.swing.JTabbedPane tabbedPane;
-    private pf.trackable.TrackableCheckBox trackableCheckBox_customAuth;
-    private pf.trackable.TrackableCheckBox trackableCheckBox_download;
-    private pf.trackable.TrackableCheckBox trackableCheckBox_upload;
-    private pf.trackable.TrackablePasswordField trackablePasswordField_password;
-    private pf.trackable.TrackableTextField trackableTextField_username;
+    private pf.gui.custom.trackable.TrackableCheckBox trackableCheckBox_customAuth;
+    private pf.gui.custom.trackable.TrackableCheckBox trackableCheckBox_download;
+    private pf.gui.custom.trackable.TrackableCheckBox trackableCheckBox_upload;
+    private pf.gui.custom.trackable.TrackablePasswordField trackablePasswordField_password;
+    private pf.gui.custom.trackable.TrackableTextField trackableTextField_username;
     // End of variables declaration//GEN-END:variables
 }

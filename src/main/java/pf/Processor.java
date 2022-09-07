@@ -8,6 +8,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import pf.gui.Main;
@@ -16,18 +17,20 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.text.PDFTextStripper;
+import pf.item.Item.SearchType;
 
 /**
- *
+ * The Processor class is the heart of the backend.  It handles many tasks given
+ * by the UI and respects the model-view implementation.
+ * 
  * @author      Kieran Skvortsov
- * employee#   72141
+ * employee#    72141
  */
 public class Processor {
     
-    public enum SearchType {
-        UPC, SKU, WORD;
-    }
+
     
+    //the custom output stream for communication with the UI
     private PipedOutputStream outputStream;
     
     //regex pattern that matches how products are listed
@@ -43,52 +46,81 @@ public class Processor {
     private PlanogramHandler planogramHandler = new PlanogramHandler();
     private ArrayList<Item> itemsFound = new ArrayList<>();
     
+    //the connection to the remote database
     private MongoDBConnection mongoDBConnection;
     
+    /**
+     * Creates a new processor object which binds an input stream for
+     * cross-communication between the UI and backend, and initializes a 
+     * connection to the remote database.
+     * 
+     * @param inputStream 
+     */
     public Processor(PipedInputStream inputStream) {
         bindPipe(inputStream);
         
         mongoDBConnection = new MongoDBConnection();
     }
     
+    /**
+     * Binds the standard System::out pipeline to a custom output pipeline for
+     * cross-communication between the UI and backend.
+     * 
+     * @param inputStream The PipedInputStream object to bind to
+     */
     public void bindPipe(PipedInputStream inputStream) {
         if(outputStream != null)
             try {
                 outputStream.close();
-            } catch (IOException ex) {
-                System.err.println(ex);
-            }
+            //Do not care about an output
+            } catch (IOException ex) { }
         
         outputStream = new PipedOutputStream();
         
         try {
             inputStream.connect(outputStream);
         } catch (IOException ex) {
-            System.err.println(ex.getMessage());
+            System.err.println(ex);
             return;
         }
         
         System.setOut(new PrintStream(outputStream));
     }
     
+    /**
+     * Returns an ArrayList of all Item objects contained within the locally
+     * instanced {@link PlanogramHandler}
+     * 
+     * @return The ArrayList of Items
+     */
     public ArrayList<Item> getAllItems() {
         return planogramHandler.getAllItems();
     }
+
     
-    public void resetMongoDB() {
-        mongoDBConnection.deleteAll();
+    /**
+     * Retrieves all Items from the remote database.  Consumes a {@link Consumer}
+     * callback when finished, passing the Items fetched as a singular 
+     * {@link Planogram} object
+     * 
+     * @param callback The callback execution to run on finish
+     */
+    public void pullFromMongoDB(Consumer<Planogram> callback) {
+        //start the thread to pull items and when finished
+        //  create a new planogram
+        mongoDBConnection.pullAllItems((items) -> {
+            Planogram p = createNewPlanogram("Master Database", items);
+            callback.accept(p);
+        });
     }
     
-    public void uploadItemsToMongoDB() {
-        mongoDBConnection.uploadItems(planogramHandler.getAllItems());
-    }
-    
-    public ArrayList<Item> pullFromMongoDB() {
-        ArrayList<Item> allItems = mongoDBConnection.pullAllItems();
-        createNewPlanogram("Master Database", allItems);
-        return allItems;
-    }
-    
+    /**
+     * Starts a threaded execution parsing a PDF into Item objects.  On completion,
+     * runs a {@link Runnable} callback.
+     * 
+     * @param file The file to parse
+     * @param callback The callback execution to run on finish
+     */
     public void startParsing(File file, Runnable callback) {
         Thread parsingThread = new Thread(new Runnable() {
             @Override
@@ -106,15 +138,15 @@ public class Processor {
     }
     
     /**
-     * Parses a planogram pdf into objects used for the view model
+     * Parses a planogram PDF into Item objects used for the view model.  This is
+     * a synchronized method to prevent multi-threaded executions.
      * 
      * @param file Planogram PDF file
-     * @return
      * 
      * @throws IOException
      * @throws InterruptedException 
      */
-    public boolean parseToPlanogram(File file) throws IOException, InterruptedException {
+    public synchronized void parseToPlanogram(File file) throws IOException, InterruptedException {
         //an array to hold strings for each page
         String[] pageStrings;
         
@@ -225,23 +257,29 @@ public class Processor {
         
         //update the progress bar in the UI
         Main.setProgress(0);
-        return true;
     }
     
+    /**
+     * Creates a new Planogram object with a name and an ArrayList of Items, and
+     * adds it to the locally instanced {@link PlanogramHandler}
+     * 
+     * @param name The planogram's name
+     * @param items The Items in the planogram
+     * @return The Planogram object created
+     */
     private Planogram createNewPlanogram(String name, ArrayList<Item> items) {
         Planogram p = new Planogram(name);
         p.addItems(items);
         
         planogramHandler.add(p);
-        
         return p;
     }
     
     /**
      * Returns a printer-friendly formatted String of Items
      * 
-     * @param itemSKUs
-     * @return 
+     * @param itemSKUs The Item objects
+     * @return A printer-friendly String of items
      */
     public String getPrintableSheet(ArrayList<String> itemSKUs) {
         StringBuilder sb = new StringBuilder();
@@ -287,12 +325,35 @@ public class Processor {
         
         return itemsArray;
     }
-    
+        
     /**
-     * Resets all data (in preparation for a re-upload)
+     * Resets all data in the locally instanced {@link PlanogramHandler}
      */
     public void reset() {
         planogramHandler.clear();
         itemsFound.clear();
     }
+    
+    // <editor-fold defaultstate="collapsed" desc="DEVELOPMENT-ONLY METHODS">
+    
+    /**
+     * Deletes all data from the remote database.
+     * 
+     * DEVELOPMENT ONLY.
+     */
+    public void resetMongoDB() {
+        mongoDBConnection.deleteAll();
+    }
+    
+    /**
+     * Uploads all Item objects currently stored within the 
+     * locally instanced {@link PlanogramHandler}
+     * 
+     * DEVELOPMENT ONLY.
+     */
+    public void uploadItemsToMongoDB() {
+        mongoDBConnection.uploadItems(planogramHandler.getAllItems());
+    }
+    
+    // </editor-fold>
 }

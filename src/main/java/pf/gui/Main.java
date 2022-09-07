@@ -3,7 +3,7 @@ package pf.gui;
 
 import pf.item.ItemCustomTableModel;
 import pf.item.Item;
-import pf.planogram.PlanogramCustomTabelModel;
+import pf.planogram.PlanogramCustomTableModel;
 import pf.Processor;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -22,6 +22,7 @@ import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import pf.Launcher;
 import pf.UserSettings;
+import pf.item.Item.SearchType;
 
 /**
  *
@@ -35,7 +36,7 @@ public class Main extends javax.swing.JFrame {
     
     //custom models for tabels and how they display information
     private static ItemCustomTableModel itemCTM = new ItemCustomTableModel();
-    private static PlanogramCustomTabelModel planogramCTM = new PlanogramCustomTabelModel();
+    private static PlanogramCustomTableModel planogramCTM = new PlanogramCustomTableModel();
     
     //instance variable to reference settings to make sure only one Settings
     //  window is open at any time
@@ -193,6 +194,8 @@ public class Main extends javax.swing.JFrame {
         menuItem_about = new javax.swing.JMenuItem();
         menuItem_settings = new javax.swing.JMenuItem();
         menuItem_exit = new javax.swing.JMenuItem();
+        separator03 = new javax.swing.JPopupMenu.Separator();
+        menuItem_license = new javax.swing.JMenuItem();
         menu_view = new javax.swing.JMenu();
         checkBoxMenuItem_developer = new javax.swing.JCheckBoxMenuItem();
 
@@ -526,6 +529,15 @@ public class Main extends javax.swing.JFrame {
             }
         });
         menu_file.add(menuItem_exit);
+        menu_file.add(separator03);
+
+        menuItem_license.setText("Licensed Under Apache V2.0");
+        menuItem_license.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_licenseActionPerformed(evt);
+            }
+        });
+        menu_file.add(menuItem_license);
 
         menuBar.add(menu_file);
 
@@ -642,11 +654,11 @@ public class Main extends javax.swing.JFrame {
         int selectionIndex = comboBox_searchType.getSelectedIndex();
         String selection = comboBox_searchType.getItemAt(selectionIndex);
 
-        Processor.SearchType type = null;
+        SearchType type = null;
 
-        if(selection.equals("UPC"))         type = Processor.SearchType.UPC;
-        else if (selection.equals("SKU"))   type = Processor.SearchType.SKU;
-        else if (selection.equals("WORD"))  type = Processor.SearchType.WORD;
+        if(selection.equals("UPC"))         type = SearchType.UPC;
+        else if (selection.equals("SKU"))   type = SearchType.SKU;
+        else if (selection.equals("WORD"))  type = SearchType.WORD;
 
         String digits = textField_input.getText();
         Item[] itemsFound = processor.search(digits, type);
@@ -693,7 +705,7 @@ public class Main extends javax.swing.JFrame {
         sb.append("\n");
         sb.append("Copyright © 2022 Kieran Skvortsov\n\n");
         sb.append("Developed with \u2665 for lost and\n");
-        sb.append("confused KinneyDrugs® employees");
+        sb.append("confused KinneyDrugs® employees\n\n");
         
         JOptionPane.showOptionDialog(this, sb.toString(), "About", 
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, 
@@ -774,18 +786,27 @@ public class Main extends javax.swing.JFrame {
     private void menuItem_pullFromDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_pullFromDatabaseActionPerformed
         resetUI();
         
-        processor.pullFromMongoDB().forEach(i -> {
-            itemCTM.addItem(i);
+        //start the pull from the database, and update the table model from
+        //  the resulting planogram when finished processing
+        processor.pullFromMongoDB((planogram) -> {
+            itemCTM.addPlanogram(planogram);
+            
+            planogramCTM.addPlanogram("Master Database");
+            planogramCTM.updateTable();
         });
-        itemCTM.updateTable();
-        
-        planogramCTM.addPlanogram("Master Database");
-        planogramCTM.updateTable();
     }//GEN-LAST:event_menuItem_pullFromDatabaseActionPerformed
 
     private void button_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_resetActionPerformed
         processor.resetMongoDB();
     }//GEN-LAST:event_button_resetActionPerformed
+
+    private void menuItem_licenseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_licenseActionPerformed
+        try {
+            Desktop.getDesktop().browse(new URI("https://www.apache.org/licenses/LICENSE-2.0.txt"));
+        } catch (IOException | URISyntaxException ex) {
+            System.err.println(ex);
+        }
+    }//GEN-LAST:event_menuItem_licenseActionPerformed
 
     
     private void resetUI() {
@@ -808,6 +829,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem_checkForUpdates;
     private javax.swing.JMenuItem menuItem_exit;
     private javax.swing.JMenuItem menuItem_github;
+    private javax.swing.JMenuItem menuItem_license;
     private javax.swing.JMenuItem menuItem_print;
     private javax.swing.JMenuItem menuItem_pullFromDatabase;
     private javax.swing.JMenuItem menuItem_reupload;
@@ -824,6 +846,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollPane_textArea_output;
     private javax.swing.JPopupMenu.Separator separator01;
     private javax.swing.JPopupMenu.Separator separator02;
+    private javax.swing.JPopupMenu.Separator separator03;
     private javax.swing.JTable table_items;
     private javax.swing.JTable table_planograms;
     private javax.swing.JTextArea textArea_output;

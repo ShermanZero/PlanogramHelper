@@ -3,8 +3,8 @@ package pf.planogram;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import pf.Processor;
 import pf.item.Item;
+import pf.item.Item.SearchType;
 import pf.item.ItemHashMap;
 
 /**
@@ -51,7 +51,7 @@ public class Planogram {
      * @param searchType The SearchType to query by
      * @return 
      */
-    public ArrayList<Item> getItemsByQuery(String query, Processor.SearchType searchType) {
+    public ArrayList<Item> getItemsByQuery(String query, SearchType searchType) {
         return itemsInPlanogram.findByQuery(query, searchType);
     }
     

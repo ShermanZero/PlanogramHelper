@@ -2,8 +2,8 @@ package pf.planogram;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import pf.Processor.SearchType;
 import pf.item.Item;
+import pf.item.Item.SearchType;
 
 /**
  *

@@ -13,6 +13,7 @@ import com.mongodb.client.model.WriteModel;
 import com.mongodb.client.result.InsertOneResult;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 import org.bson.Document;
 import pf.gui.Main;
 import pf.item.Item;
@@ -29,14 +30,16 @@ public class MongoDBConnection {
     
     private MongoCollection<Document> collection;
     
+    private Thread pullThread;
+    
     //force connection on instance creation
     public MongoDBConnection() {
         connect();
     }
     
     private void connect() {
-        String clusterUser = null;
-        String clusterPass = null;
+        String clusterUser;
+        String clusterPass;
         
         //check if custom authentication has been enabled in the UI
         if(Boolean.parseBoolean(UserSettings.getProperty("auth.custom"))) {
@@ -104,24 +107,32 @@ public class MongoDBConnection {
     }
     
     /**
-     * Fetches all items from the database (as long as they contain a DESC field)
+     * Fetches all items from the database.  Synchronized to avoid multi-threaded
+     * calls
      * 
-     * @return 
+     * @param callback The callback method that accepts an ArrayList of Items
      */
-    public ArrayList<Item> pullAllItems() {
-        ArrayList<Item> items = new ArrayList<>();
+    public synchronized void pullAllItems(Consumer<ArrayList<Item>> callback) {
+        if(pullThread != null && pullThread.isAlive())
+            try { pullThread.join(); } catch (InterruptedException ex) {}
         
         //creates a thread to download all the Items from the database
-        Thread pullThread = new Thread(new Runnable() {
+        pullThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Main.setProgress(10);
+                ArrayList<Item> items = new ArrayList<>();
+
+                //number of documents in the collection
+                int numItems = (int)collection.countDocuments();
                 
-                //pulls all Documents containing a "DESC"
-                FindIterable<Document> allDocs = findAllContaining("DESC", "");
+                System.out.println(String.format("Fetching %d documents from database", numItems));
                 
-                Main.setProgress(50);
-        
+                //current document we're parsing
+                int currDoc = 0;
+                
+                //pulls all Documents
+                FindIterable<Document> allDocs = collection.find();
+                
                 //convert each Document into an Item
                 for(Document d : allDocs) {
                     Item i = new Item(
@@ -133,24 +144,25 @@ public class MongoDBConnection {
                     i.setName(d.get("Name").toString());
 
                     items.add(i);
+                    
+                    Main.updateProgress(++currDoc, numItems);
                 }
                 
+                Main.setProgress(100);
+                
+                //small delay before updating the progressbar
+                try { 
+                    Thread.sleep(100); 
+                } catch (InterruptedException ex) { System.err.println(ex); }
+                
                 Main.setProgress(0);
+                
+                //accept the callback and return the found Items
+                callback.accept(items);
             }
         });
         
         pullThread.start();
-        
-        try {
-            pullThread.join();
-        } catch (InterruptedException ex) {
-            System.err.println(ex);
-        }
-        
-        //TODO: create a callback runnable because this thread currently does
-        //  nothing
-        
-        return items;
     }
     
     /**

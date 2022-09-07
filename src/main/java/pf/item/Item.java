@@ -1,13 +1,15 @@
 package pf.item;
 
-import pf.Processor.SearchType;
+import java.io.Serializable;
 
 /**
- *
+ * The Item class represents an item in a planogram, or a better way to think of
+ * it is just a product.
+ * 
  * @author      Kieran Skvortsov
- * employee#   72141
+ * employee#    72141
  */
-public class Item {
+public class Item implements Serializable {
     private final int position;
     private final String SKU;
     private final String description;
@@ -19,13 +21,23 @@ public class Item {
     private String name;
     
     /**
+     * The SearchType enum represents how an Item can be searched by.  It accepts
+     * either UPC, SKU, or WORD.
      * 
-     * @param position
-     * @param SKU
-     * @param description
-     * @param UPC
-     * @param facings
-     * @param isNew 
+     */
+    public enum SearchType {
+        UPC, SKU, WORD;
+    }
+    
+    /**
+     * Creates a new Item object
+     * 
+     * @param position The position of the Item relative to its row/section
+     * @param SKU The Item's SKU
+     * @param description The Item's description
+     * @param UPC The Item's UPC
+     * @param facings The Item's facings
+     * @param isNew If the Item is new
      */
     public Item(int position, String SKU, String description, String UPC, int facings, boolean isNew) {
         this.position = position;
@@ -36,52 +48,105 @@ public class Item {
         this.isNew = isNew;
     }
     
+    /**
+     * Sets the fixture of the Item
+     * 
+     * @param fixture The fixture
+     */
     public void setFixture(String fixture) {
         this.fixture = fixture;
     }
     
+    /**
+     * Sets the name associated with the Item.  Note, in the planogram PDF
+     * files, this is the name of the location.
+     * 
+     * @param name The name
+     */
     public void setName(String name) {
         this.name = name;
     }
     
+    /**
+     * Returns the position of the Item
+     * 
+     * @return 
+     */
     public int getPosition() {
         return position;
     }
     
+    /**
+     * Returns the SKU of the Item
+     * 
+     * @return The SKU
+     */
     public String getSKU() { 
         return SKU;
     }
     
+    /**
+     * Returns the description of the Item
+     * 
+     * @return The description
+     */
     public String getDescription() {
         return description;
     }
     
+    /**
+     * Returns the UPC of the Item
+     * 
+     * @return The UPC
+     */
     public String getUPC() {
         return UPC;
     }
     
+    /**
+     * Returns how many facings the Item has
+     * 
+     * @return The facings
+     */
     public int getFacings() {
         return facings;
     }
     
+    /**
+     * Returns if the Item is new
+     * 
+     * @return New or not
+     */
     public boolean getIsNew() {
         return isNew;
     }
     
+    /**
+     * Returns the fixture of the Item
+     * 
+     * @return The fixture
+     */
     public String getFixture() {
         return fixture;
     }
     
+    /**
+     * Returns the name associated with the Item.  Note, in the planogram PDF
+     * files, this is the name of the location.
+     * 
+     * 
+     * @return 
+     */
     public String getName() {
         return name;
     }
     
     /**
-     * Returns if a query by a searchtype matches this Item object
+     * Returns if a query by a {@link SearchType} matches this Item object
      * 
      * @param queryString the String to query with
      * @param searchType the SearchType to query by
-     * @return 
+     * @return Matches or not
      */
     public boolean matches(String queryString, SearchType searchType) {
         switch(searchType) {
@@ -91,11 +156,6 @@ public class Item {
         }
         
         return false;
-    }
-    
-    //unused - development/testing only
-    public String getItemData() {
-        return (description + " @ #" + position + (isNew ? " NEW" : ""));
     }
     
     @Override
@@ -108,9 +168,23 @@ public class Item {
     }
     
     /**
-     * Returns a print-suitable formatted String
+     * Overridden equals method determines if an Item is equal to another item
+     * if their SKUs are the same
      * 
-     * @return 
+     * @param other The other Item to compare to
+     * @return If the two SKUs are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        Item item = (Item)other;
+        
+        return this.SKU.equals(item.getSKU());
+    }
+    
+    /**
+     * Returns a printer-friendly formatted String representing the Item
+     * 
+     * @return The printer-friendly String
      */
     public String getPrintable() {
         return String.format(
@@ -122,7 +196,7 @@ public class Item {
     /**
      * Returns the formatted header for a new page
      * 
-     * @return 
+     * @return The header
      */
     public static String getHeader() {
         return String.format(

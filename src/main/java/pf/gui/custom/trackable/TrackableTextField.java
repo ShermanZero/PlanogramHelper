@@ -1,4 +1,4 @@
-package pf.trackable;
+package pf.gui.custom.trackable;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -6,7 +6,8 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Admin
+ * @author      Kieran Skvortsov
+ * employee#    72141
  */
 public class TrackableTextField extends JTextField implements Trackable<String> {
 

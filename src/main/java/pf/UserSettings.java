@@ -6,11 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
-import pf.trackable.Trackable;
-import pf.trackable.UnnamedException;
+import pf.gui.custom.trackable.Trackable;
+import pf.gui.custom.trackable.UnnamedException;
 
 /**
- *
+ * The UserSettings class is responsible for saving and loading all user-set
+ * settings represented in the UI.
+ * 
  * @author      Kieran Skvortsov
  * employee#    72141
  */

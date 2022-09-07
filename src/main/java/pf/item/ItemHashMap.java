@@ -4,7 +4,7 @@ package pf.item;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import pf.Processor;
+import pf.item.Item.SearchType;
 
 /**
  *
@@ -65,7 +65,7 @@ public class ItemHashMap extends HashMap<String, Item> {
      * @param searchType How to query for the items
      * @return An ArrayList of Item objects satisfying the query
      */
-    public ArrayList<Item> findByQuery(String query, Processor.SearchType searchType) {
+    public ArrayList<Item> findByQuery(String query, SearchType searchType) {
         ArrayList<Item> results = new ArrayList<Item>();
         
         this.keySet().stream().forEach(SKU -> {
@@ -74,13 +74,13 @@ public class ItemHashMap extends HashMap<String, Item> {
             String UPC  = i.getUPC();
             String desc = i.getDescription().toLowerCase();
             
-            if(searchType == Processor.SearchType.SKU && SKU.endsWith(query)) 
+            if(searchType == SearchType.SKU && SKU.endsWith(query)) 
                 results.add(i);
             else
-            if(searchType == Processor.SearchType.UPC && UPC.endsWith(query)) 
+            if(searchType == SearchType.UPC && UPC.endsWith(query)) 
                 results.add(i);
             else
-            if(searchType == Processor.SearchType.WORD && desc.contains(query)) 
+            if(searchType == SearchType.WORD && desc.contains(query)) 
                 results.add(i);
         });
         

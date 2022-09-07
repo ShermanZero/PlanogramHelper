@@ -5,26 +5,33 @@ import java.io.File;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * The PlanogramCustomTableModel class extends the DefaultTableModel and
+ * sets up the custom view for the UI.
+ * 
  * @author      Kieran Skvortsov
- * employee#   72141
+ * employee#    72141
  */
-public class PlanogramCustomTabelModel extends DefaultTableModel {
+public class PlanogramCustomTableModel extends DefaultTableModel {
     
     
-    public PlanogramCustomTabelModel() {
+    public PlanogramCustomTableModel() {
         setColumnIdentifiers(new Object[] {"INCLUDE", "PLANOGRAM"});
     }
     
     /**
      * Adds a planogram to the table model (only the absolute path)
      * 
-     * @param f 
+     * @param f Planogram PDF File 
      */
     public void addPlanogram(File f) {
         super.addRow(new Object[] {true, f.getAbsolutePath()});
     }
     
+    /**
+     * Adds a planogram to the table model by name
+     * 
+     * @param name Name of the planogram
+     */
     public void addPlanogram(String name) {
         super.addRow(new Object[] {true, name});
     }
