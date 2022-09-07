@@ -4,4 +4,4 @@ bin/
 *.properties
 *.xml
 
-!target/site/apidocs/index.html
+!target/site/apidocs/*
