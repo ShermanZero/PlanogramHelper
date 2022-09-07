@@ -10,7 +10,9 @@ import pf.gui.custom.trackable.Trackable;
 import pf.gui.custom.trackable.UnnamedException;
 
 /**
- *
+ * The UserSettings class is responsible for saving and loading all user-set
+ * settings represented in the UI.
+ * 
  * @author      Kieran Skvortsov
  * employee#    72141
  */

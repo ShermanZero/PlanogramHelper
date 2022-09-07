@@ -7,11 +7,10 @@ import java.util.Properties;
 import pf.gui.Main;
 
 /**
- *
+ * Main class responsible for launching the program.
+ * 
  * @author      Kieran Skvortsov
  * employee#    72141
- * 
- * Main class and backbone
  */
 public class Launcher {
     

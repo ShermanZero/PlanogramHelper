@@ -5,14 +5,16 @@ import java.io.File;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * The PlanogramCustomTableModel class extends the DefaultTableModel and
+ * sets up the custom view for the UI.
+ * 
  * @author      Kieran Skvortsov
  * employee#    72141
  */
-public class PlanogramCustomTabelModel extends DefaultTableModel {
+public class PlanogramCustomTableModel extends DefaultTableModel {
     
     
-    public PlanogramCustomTabelModel() {
+    public PlanogramCustomTableModel() {
         setColumnIdentifiers(new Object[] {"INCLUDE", "PLANOGRAM"});
     }
     

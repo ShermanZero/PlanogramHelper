@@ -3,7 +3,7 @@ package pf.gui;
 
 import pf.item.ItemCustomTableModel;
 import pf.item.Item;
-import pf.planogram.PlanogramCustomTabelModel;
+import pf.planogram.PlanogramCustomTableModel;
 import pf.Processor;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -22,6 +22,7 @@ import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import pf.Launcher;
 import pf.UserSettings;
+import pf.item.Item.SearchType;
 
 /**
  *
@@ -35,7 +36,7 @@ public class Main extends javax.swing.JFrame {
     
     //custom models for tabels and how they display information
     private static ItemCustomTableModel itemCTM = new ItemCustomTableModel();
-    private static PlanogramCustomTabelModel planogramCTM = new PlanogramCustomTabelModel();
+    private static PlanogramCustomTableModel planogramCTM = new PlanogramCustomTableModel();
     
     //instance variable to reference settings to make sure only one Settings
     //  window is open at any time
@@ -653,11 +654,11 @@ public class Main extends javax.swing.JFrame {
         int selectionIndex = comboBox_searchType.getSelectedIndex();
         String selection = comboBox_searchType.getItemAt(selectionIndex);
 
-        Processor.SearchType type = null;
+        SearchType type = null;
 
-        if(selection.equals("UPC"))         type = Processor.SearchType.UPC;
-        else if (selection.equals("SKU"))   type = Processor.SearchType.SKU;
-        else if (selection.equals("WORD"))  type = Processor.SearchType.WORD;
+        if(selection.equals("UPC"))         type = SearchType.UPC;
+        else if (selection.equals("SKU"))   type = SearchType.SKU;
+        else if (selection.equals("WORD"))  type = SearchType.WORD;
 
         String digits = textField_input.getText();
         Item[] itemsFound = processor.search(digits, type);

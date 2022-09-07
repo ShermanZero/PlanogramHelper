@@ -104,6 +104,7 @@ public class Settings extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings");
+        setResizable(false);
 
         label_local.setText("Local Planograms");
 

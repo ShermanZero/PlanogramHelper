@@ -1,15 +1,15 @@
 package pf.gui.custom.trackable;
 
 /**
- *
- * @author      Kieran Skvortsov
- * employee#    72141
- * 
  * An interface implementable by Components that need
  * to be tracked.  Meaning, when their value changes,
  * an action should be taken (mainly updating a local
  * variable to match the new value).  Trackable components
  * are used for saving/loading user settings.
+ * 
+ * @author      Kieran Skvortsov
+ * employee#    72141
+ * 
  */
 public interface Trackable<T> {
     public String getName();

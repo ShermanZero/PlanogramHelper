@@ -6,7 +6,9 @@ import javax.swing.table.DefaultTableModel;
 import pf.planogram.Planogram;
 
 /**
- *
+ * The PlanogramCustomTableModel class extends the DefaultTableModel and
+ * sets up the custom view for {@link Item}s in the UI.
+ * 
  * @author      Kieran Skvortsov
  * employee#    72141
  */
@@ -24,7 +26,7 @@ public class ItemCustomTableModel extends DefaultTableModel {
     /**
      * Adds an item to the table model
      * 
-     * @param i Item to add
+     * @param i The Item to add
      */
     public void addItem(Item i) {
         if(itemsKeptSKUs.contains(i.getSKU())) return;

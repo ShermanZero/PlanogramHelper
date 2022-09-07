@@ -38,8 +38,8 @@ public class MongoDBConnection {
     }
     
     private void connect() {
-        String clusterUser = null;
-        String clusterPass = null;
+        String clusterUser;
+        String clusterPass;
         
         //check if custom authentication has been enabled in the UI
         if(Boolean.parseBoolean(UserSettings.getProperty("auth.custom"))) {
