@@ -30,6 +30,8 @@ public class MongoDBConnection {
     
     private MongoCollection<Document> collection;
     
+    private Thread pullThread;
+    
     //force connection on instance creation
     public MongoDBConnection() {
         connect();
@@ -111,8 +113,11 @@ public class MongoDBConnection {
      * @param callback The callback method that accepts an ArrayList of Items
      */
     public synchronized void pullAllItems(Consumer<ArrayList<Item>> callback) {
+        if(pullThread != null && pullThread.isAlive())
+            try { pullThread.join(); } catch (InterruptedException ex) {}
+        
         //creates a thread to download all the Items from the database
-        Thread pullThread = new Thread(new Runnable() {
+        pullThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 ArrayList<Item> items = new ArrayList<>();
