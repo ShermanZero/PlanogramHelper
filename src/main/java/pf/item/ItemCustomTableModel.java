@@ -3,11 +3,12 @@ package pf.item;
 
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
+import pf.planogram.Planogram;
 
 /**
  *
  * @author      Kieran Skvortsov
- * employee#   72141
+ * employee#    72141
  */
 public class ItemCustomTableModel extends DefaultTableModel {
     
@@ -29,6 +30,18 @@ public class ItemCustomTableModel extends DefaultTableModel {
         if(itemsKeptSKUs.contains(i.getSKU())) return;
         
         super.addRow(new Object[] {false, i.getSKU(), i.getUPC(), i.getDescription(), i.getFixture(), i.getName()});
+    }
+    
+    /**
+     * Adds a planogram to the table model by iterating through the items inside
+     * and adding them one-by-one via {@link addItem}.
+     * 
+     * @param p The Planogram object
+     */
+    public void addPlanogram(Planogram p) {
+        p.getAllItems().forEach((item) -> {
+            addItem(item);
+        });
     }
     
     // Forcing column 0 to be boolean and represented with a checkbox

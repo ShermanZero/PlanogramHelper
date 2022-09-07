@@ -1,4 +1,4 @@
-package pf.trackable;
+package pf.gui.custom.trackable;
 
 import javax.swing.JCheckBox;
 

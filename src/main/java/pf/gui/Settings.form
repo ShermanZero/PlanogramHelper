@@ -159,26 +159,26 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="trackableCheckBox_customAuth" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="label_username" min="-2" max="-2" attributes="0"/>
                                   <Component id="label_password" min="-2" max="-2" attributes="0"/>
-                                  <Component id="trackableTextField_username" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="trackablePasswordField_password" alignment="0" pref="148" max="32767" attributes="0"/>
+                                  <Component id="trackableTextField_username" pref="140" max="32767" attributes="0"/>
+                                  <Component id="trackablePasswordField_password" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="label_warning" min="-2" max="-2" attributes="0"/>
-                                  <Component id="label_warning1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="label_warning_1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="label_warning_2" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="trackableCheckBox_customAuth" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="12" max="32767" attributes="0"/>
+                      <EmptySpace pref="20" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -191,15 +191,15 @@
                       <Component id="label_username" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="label_warning_1" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="trackableTextField_username" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="label_warning" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="label_password" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="label_warning_2" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="trackablePasswordField_password" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="label_warning1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="41" max="32767" attributes="0"/>
                   </Group>
@@ -207,13 +207,10 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="pf.trackable.TrackableCheckBox" name="trackableCheckBox_customAuth">
+            <Component class="pf.gui.custom.trackable.TrackableCheckBox" name="trackableCheckBox_customAuth">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Use Custom Authentication"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="trackableCheckBox_customAuthActionPerformed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="label_username">
               <Properties>
@@ -223,19 +220,9 @@
                 <Property name="text" type="java.lang.String" value="Username"/>
               </Properties>
             </Component>
-            <Component class="pf.trackable.TrackableTextField" name="trackableTextField_username">
+            <Component class="pf.gui.custom.trackable.TrackableTextField" name="trackableTextField_username">
             </Component>
-            <Component class="javax.swing.JLabel" name="label_password">
-              <Properties>
-                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="99" green="99" red="99" type="rgb"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Password"/>
-              </Properties>
-            </Component>
-            <Component class="pf.trackable.TrackablePasswordField" name="trackablePasswordField_password">
-            </Component>
-            <Component class="javax.swing.JLabel" name="label_warning">
+            <Component class="javax.swing.JLabel" name="label_warning_1">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="12" style="3"/>
@@ -246,7 +233,17 @@
                 <Property name="text" type="java.lang.String" value="Warning: saved locally as plaintext"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="label_warning1">
+            <Component class="javax.swing.JLabel" name="label_password">
+              <Properties>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="99" green="99" red="99" type="rgb"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Password"/>
+              </Properties>
+            </Component>
+            <Component class="pf.gui.custom.trackable.TrackablePasswordField" name="trackablePasswordField_password">
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_warning_2">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="12" style="3"/>
@@ -271,14 +268,19 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="label_startup" min="-2" max="-2" attributes="0"/>
-                          <Component id="trackableCheckBox_upload" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="trackableCheckBox_download" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="trackableCheckBox_download" min="-2" max="-2" attributes="0"/>
+                                  <Component id="trackableCheckBox_upload" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="197" max="32767" attributes="0"/>
+                      <EmptySpace pref="219" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -302,14 +304,14 @@
                 <Property name="text" type="java.lang.String" value="Startup Behaviors"/>
               </Properties>
             </Component>
-            <Component class="pf.trackable.TrackableCheckBox" name="trackableCheckBox_upload">
+            <Component class="pf.gui.custom.trackable.TrackableCheckBox" name="trackableCheckBox_upload">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Upload Local Planograms"/>
               </Properties>
             </Component>
-            <Component class="pf.trackable.TrackableCheckBox" name="trackableCheckBox_download">
+            <Component class="pf.gui.custom.trackable.TrackableCheckBox" name="trackableCheckBox_download">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Download Remote Planograms"/>
+                <Property name="text" type="java.lang.String" value="Download From Database"/>
               </Properties>
             </Component>
           </SubComponents>

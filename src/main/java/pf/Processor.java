@@ -8,6 +8,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import pf.gui.Main;
@@ -55,9 +56,7 @@ public class Processor {
         if(outputStream != null)
             try {
                 outputStream.close();
-            } catch (IOException ex) {
-                System.err.println(ex);
-            }
+            } catch (IOException ex) { System.err.println(ex); }
         
         outputStream = new PipedOutputStream();
         
@@ -65,6 +64,7 @@ public class Processor {
             inputStream.connect(outputStream);
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
+            
             return;
         }
         
@@ -83,10 +83,13 @@ public class Processor {
         mongoDBConnection.uploadItems(planogramHandler.getAllItems());
     }
     
-    public ArrayList<Item> pullFromMongoDB() {
-        ArrayList<Item> allItems = mongoDBConnection.pullAllItems();
-        createNewPlanogram("Master Database", allItems);
-        return allItems;
+    public void pullFromMongoDB(Consumer<Planogram> callback) {
+        //start the thread to pull items and when finished
+        //  create a new planogram
+        mongoDBConnection.pullAllItems((items) -> {
+            Planogram p = createNewPlanogram("Master Database", items);
+            callback.accept(p);
+        });
     }
     
     public void startParsing(File file, Runnable callback) {
