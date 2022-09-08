@@ -1,7 +1,5 @@
 # [PlanogramHelper](https://shermanzero.github.io/PlanogramHelper/)
 
-Hey there someone who probably could hire me, let me tell you why you *should*:
-
 ![image](https://user-images.githubusercontent.com/16752746/188516429-61b3ae2d-2b4c-4f73-a2b4-0bd276f883be.png)
 
 ### What does it do?
