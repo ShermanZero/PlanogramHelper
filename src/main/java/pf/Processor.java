@@ -286,7 +286,7 @@ public class Processor {
         sb.append(Item.getHeader());
         
         itemSKUs.stream().forEach(SKU -> {
-            sb.append(planogramHandler.getItem(SKU).getPrintable());
+            sb.append(planogramHandler.getItem(SKU).getPrinterFriendly());
         });
         
         return sb.toString();

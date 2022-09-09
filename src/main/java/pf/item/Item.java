@@ -17,6 +17,8 @@ public class Item implements Serializable {
     private final int facings;
     private final boolean isNew;
     
+    
+    private String friendlyLocation;
     private String fixture;
     private String name;
     
@@ -55,6 +57,17 @@ public class Item implements Serializable {
      */
     public void setFixture(String fixture) {
         this.fixture = fixture;
+        
+        String[] parsedFixture = fixture.split(".");
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("Section [");
+        sb.append(Integer.parseInt(parsedFixture[0]));
+        sb.append("] | Shelf [");
+        sb.append(Integer.parseInt(parsedFixture[1]));
+        sb.append("]");
+        
+        friendlyLocation = sb.toString();
     }
     
     /**
@@ -186,11 +199,21 @@ public class Item implements Serializable {
      * 
      * @return The printer-friendly String
      */
-    public String getPrintable() {
+    public String getPrinterFriendly() {
         return String.format(
-                "%-10s %-13s %-35s %-13s %-15s %s\n", SKU, UPC, description, 
-                fixture, name, isNew? "(NEW)":""
+                "%-10s %-13s %-35s %-13s %s\n", SKU, UPC, description, 
+                friendlyLocation, isNew? "(NEW)":""
             );
+    }
+    
+    /**
+     * Returns a user-friendly readable description of the Item's location parsed
+     * by the fixture.
+     * 
+     * @return User-friendly location
+     */
+    public String getFriendlyLocation() {
+        return friendlyLocation;
     }
     
     /**
@@ -200,8 +223,8 @@ public class Item implements Serializable {
      */
     public static String getHeader() {
         return String.format(
-                "%-10s %-13s %-35s %-13s %-15s\n",
-                "[SKU]", "[UPC]", "[DESCRIPTION]", "[FIXTURE]", "[NAME]"
+                "%-10s %-13s %-35s %-13s\n",
+                "[SKU]", "[UPC]", "[DESCRIPTION]", "[LOCATION]"
             );
     }
 }
