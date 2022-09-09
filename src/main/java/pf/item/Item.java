@@ -10,13 +10,13 @@ import java.io.Serializable;
  * employee#    72141
  */
 public class Item implements Serializable {
-    private final int position;
+    
+    private int position;
     private final String SKU;
     private final String description;
     private final String UPC;
     private final int facings;
     private final boolean isNew;
-    
     
     private String friendlyLocation;
     private String fixture;
@@ -57,18 +57,7 @@ public class Item implements Serializable {
      */
     public void setFixture(String fixture) {
         this.fixture = fixture;
-        
-        String[] parsedFixture = fixture.split("[.]");
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append("Section #");
-        sb.append(Integer.parseInt(parsedFixture[0]));
-        sb.append(" | Shelf #");
-        sb.append(Integer.parseInt(parsedFixture[1]));
-        sb.append(" | Slot #");
-        sb.append(position);
-        
-        friendlyLocation = sb.toString();
+        updateFriendlyLocation();
     }
     
     /**
@@ -79,6 +68,16 @@ public class Item implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+    
+    /**
+     * Sets the position relative to the shelf of the Item.
+     * 
+     * @param position The position (from left to right)
+     */
+    public void setPosition(int position) {
+        this.position = position;
+        updateFriendlyLocation();
     }
     
     /**
@@ -193,6 +192,23 @@ public class Item implements Serializable {
         Item item = (Item)other;
         
         return this.SKU.equals(item.getSKU());
+    }
+    
+    /**
+     * Updates the friendly location String with new data
+     */
+    private void updateFriendlyLocation() {
+        String[] parsedFixture = fixture.split("[.]");
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("Section #");
+        sb.append(Integer.parseInt(parsedFixture[0]));
+        sb.append(" | Shelf #");
+        sb.append(Integer.parseInt(parsedFixture[1]));
+        sb.append(" | Slot #");
+        sb.append(position);
+        
+        friendlyLocation = sb.toString();
     }
     
     /**

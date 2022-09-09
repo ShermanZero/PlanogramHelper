@@ -92,13 +92,35 @@ public class MongoDBConnection {
      * workable ArrayList
      * 
      * @param iterable The FindIterable object to unpack
-     * @return 
+     * @return The ArrayList
      */
     private ArrayList<Document> unpack(FindIterable<Document> iterable) {
         ArrayList<Document> documents = new ArrayList<>();
         
         for(Document d : iterable)
             documents.add(d);
+        
+        if(documents.isEmpty())
+            System.out.println("No items found");
+        
+        return documents;
+    }
+    
+    /**
+     * Unpacks the somewhat annoying FindIterable object into a more-easily
+     * workable ArrayList, only including relevant information.
+     * 
+     * @param iterable The FindIterable object to unpack
+     * @param via What the ArrayList will consists of
+     * @param T What type of data the ArrayList will consist of
+     * @return The ArrayList
+     */
+    private <T> ArrayList<T> unpack(FindIterable<Document> iterable, 
+            String via, Class T) {
+        ArrayList<T> documents = new ArrayList<>();
+        
+        for(Document d : iterable)
+            documents.add((T)d.get(via, T));
         
         if(documents.isEmpty())
             System.out.println("No items found");
@@ -136,8 +158,12 @@ public class MongoDBConnection {
                 //convert each Document into an Item
                 for(Document d : allDocs) {
                     Item i = new Item(
-                            0, d.get("SKU").toString(), d.get("DESC").toString(), 
-                            d.get("UPC").toString(), 0, false
+                            d.get("Position", Integer.class), 
+                            d.get("SKU", String.class), 
+                            d.get("DESC", String.class), 
+                            d.get("UPC", String.class), 
+                            0, //TODO: add facings implementation
+                            false
                         );
 
                     i.setFixture(d.get("Fixture").toString());
@@ -206,7 +232,9 @@ public class MongoDBConnection {
      */
     public void uploadItems(Collection<Item> items) {
         ArrayList<WriteModel<Document>> bulkItems = new ArrayList<>();
-        FindIterable<Document> currentlyUploaded = findAllContaining("DESC", "");
+        FindIterable<Document> currentlyUploaded = collection.find();
+        
+        ArrayList<String> currentlyUploadedSKUs = unpack(currentlyUploaded, "SKU", String.class);
         
         Thread uploadThread = new Thread(new Runnable() {
             @Override
@@ -216,7 +244,7 @@ public class MongoDBConnection {
                     int total = items.size()+1;
                     
                     for(Item i : items) {
-                        if(currentlyUploaded.filter(eq("SKU", i.getSKU())).first() == null) {
+                        if(!currentlyUploadedSKUs.contains(i.getSKU())) {
                             bulkItems.add(new InsertOneModel<>(convertToDocument(i)));
                         } else {
                             total -= 1;
@@ -224,8 +252,9 @@ public class MongoDBConnection {
                         
                         Main.updateProgress(++count, total);
                     }
-
-                    collection.bulkWrite(bulkItems);
+                    
+                    if(!bulkItems.isEmpty())
+                        collection.bulkWrite(bulkItems);
                 } catch (MongoBulkWriteException ex) {
                     System.err.println(ex);
                 }
@@ -257,6 +286,7 @@ public class MongoDBConnection {
         doc.append("UPC", i.getUPC());
         doc.append("Fixture", i.getFixture());
         doc.append("Name", i.getName());
+        doc.append("Position", i.getPosition());
         
         return doc;
     }
