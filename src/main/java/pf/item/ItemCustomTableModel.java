@@ -19,7 +19,7 @@ public class ItemCustomTableModel extends DefaultTableModel {
     
     //Sets up the default configuration for the table
     public ItemCustomTableModel() {
-        setColumnIdentifiers(new Object[] {"PRINT", "SKU", "UPC", "DESCRIPTION", "FIXTURE", "NAME"});
+        setColumnIdentifiers(new Object[] {"PRINT", "SKU", "UPC", "DESCRIPTION", "LOCATION"});
         itemsKeptSKUs = new ArrayList<>();
     }
     
@@ -31,7 +31,7 @@ public class ItemCustomTableModel extends DefaultTableModel {
     public void addItem(Item i) {
         if(itemsKeptSKUs.contains(i.getSKU())) return;
         
-        super.addRow(new Object[] {false, i.getSKU(), i.getUPC(), i.getDescription(), i.getFixture(), i.getName()});
+        super.addRow(new Object[] {false, i.getSKU(), i.getUPC(), i.getDescription(), i.getFriendlyLocation()});
     }
     
     /**

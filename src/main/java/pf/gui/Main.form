@@ -289,9 +289,11 @@
                     </Column>
                   </TableColumnModel>
                 </Property>
+                <Property name="fillsViewportHeight" type="boolean" value="true"/>
                 <Property name="gridColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="33" green="33" red="33" type="rgb"/>
                 </Property>
+                <Property name="rowSelectionAllowed" type="boolean" value="true"/>
                 <Property name="selectionMode" type="int" value="2"/>
                 <Property name="showGrid" type="boolean" value="true"/>
                 <Property name="showVerticalLines" type="boolean" value="false"/>

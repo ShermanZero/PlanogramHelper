@@ -16,6 +16,8 @@ public class Launcher {
     
     private static final Properties props = new Properties();
     
+    public static final String APP_COPYRIGHT = "© 2022 Kieran Skvortsov";
+    
     public static String APP_ARTIFACTID;
     public static String APP_VERSION;
     

@@ -58,14 +58,15 @@ public class Item implements Serializable {
     public void setFixture(String fixture) {
         this.fixture = fixture;
         
-        String[] parsedFixture = fixture.split(".");
+        String[] parsedFixture = fixture.split("[.]");
         
         StringBuilder sb = new StringBuilder();
-        sb.append("Section [");
+        sb.append("Section #");
         sb.append(Integer.parseInt(parsedFixture[0]));
-        sb.append("] | Shelf [");
+        sb.append(" | Shelf #");
         sb.append(Integer.parseInt(parsedFixture[1]));
-        sb.append("]");
+        sb.append(" | Slot #");
+        sb.append(position);
         
         friendlyLocation = sb.toString();
     }

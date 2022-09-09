@@ -49,13 +49,23 @@ public class Main extends javax.swing.JFrame {
         //various initialization for the Item table
         //TODO: move this somewhere else i.e. define it in a custom class
         table_items.setModel(itemCTM);
-        table_items.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         
-        table_items.getColumnModel().getColumn(0).setPreferredWidth(60);
-        table_items.getColumnModel().getColumn(1).setPreferredWidth(80);
-        table_items.getColumnModel().getColumn(2).setPreferredWidth(110);
-        table_items.getColumnModel().getColumn(3).setPreferredWidth(320);
-        table_items.getColumnModel().getColumn(5).setPreferredWidth(153);
+        //force the last column to fill remaining space
+        table_items.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        
+        table_items.getColumnModel().getColumn(0).setMinWidth(60);
+        table_items.getColumnModel().getColumn(0).setMaxWidth(60);
+
+        table_items.getColumnModel().getColumn(1).setMinWidth(75);
+        table_items.getColumnModel().getColumn(1).setMaxWidth(75);
+        
+        table_items.getColumnModel().getColumn(2).setMinWidth(110);
+        table_items.getColumnModel().getColumn(2).setMaxWidth(110);
+        
+        table_items.validate();
+        
+        
+
         
         for(int i = 0; i < table_items.getColumnCount(); ++i)
             table_items.getColumnModel().getColumn(i).setResizable(false);
@@ -231,7 +241,9 @@ public class Main extends javax.swing.JFrame {
             }
         });
         table_items.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        table_items.setFillsViewportHeight(true);
         table_items.setGridColor(new java.awt.Color(51, 51, 51));
+        table_items.setRowSelectionAllowed(true);
         table_items.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table_items.setShowGrid(true);
         table_items.setShowVerticalLines(false);

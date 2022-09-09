@@ -195,6 +195,8 @@ public class Processor {
             System.out.println("Checking page: " + p);
             Main.updateProgress(p, pageStrings.length);
             
+            int currentProductPosition = 0;
+            
             String[] lines = pageStrings[p].split("\n");
             
             //iterate through the lines in the page
@@ -212,7 +214,8 @@ public class Processor {
                     //update the fixture and name we are currently looking at
                     currFixture = locationMatcher.group("FIXTURE");
                     currName    = locationMatcher.group("NAME");
-
+                    
+                    currentProductPosition = 0;
                 //otherwise check to see if the current line is a product
                 } else if(productMatcher.matches()){
                     String SKU = productMatcher.group("SKU");
@@ -224,7 +227,7 @@ public class Processor {
 
                     //create a new item
                     tempItem = new Item(
-                            Integer.parseInt(productMatcher.group(1)), 
+                            ++currentProductPosition, 
                             SKU,
                             productMatcher.group("DESCRIPTION"),
                             productMatcher.group("UPC"),
@@ -283,6 +286,13 @@ public class Processor {
      */
     public String getPrintableSheet(ArrayList<String> itemSKUs) {
         StringBuilder sb = new StringBuilder();
+        sb.append(Launcher.APP_ARTIFACTID);
+        sb.append(" v");
+        sb.append(Launcher.APP_VERSION);
+        sb.append(" ");
+        sb.append(Launcher.APP_COPYRIGHT);
+        sb.append("\n\n");
+        
         sb.append(Item.getHeader());
         
         itemSKUs.stream().forEach(SKU -> {
