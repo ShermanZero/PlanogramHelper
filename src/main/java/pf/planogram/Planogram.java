@@ -65,6 +65,10 @@ public class Planogram {
         return items;
     }
     
+    public String getName() {
+        return name;
+    }
+    
     /**
      * Returns an Item by SKU.  Pass-through.
      * 

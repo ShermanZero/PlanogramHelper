@@ -13,7 +13,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class PlanogramCustomTableModel extends DefaultTableModel {
     
-    
     public PlanogramCustomTableModel() {
         setColumnIdentifiers(new Object[] {"INCLUDE", "PLANOGRAM"});
     }

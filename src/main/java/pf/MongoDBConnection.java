@@ -89,7 +89,7 @@ public class MongoDBConnection {
     
     /**
      * Unpacks the somewhat annoying FindIterable object into a more-easily
-     * workable ArrayList
+     * workable ArrayList of Documents.
      * 
      * @param iterable The FindIterable object to unpack
      * @return The ArrayList
@@ -108,7 +108,7 @@ public class MongoDBConnection {
     
     /**
      * Unpacks the somewhat annoying FindIterable object into a more-easily
-     * workable ArrayList, only including relevant information.
+     * workable ArrayList of specified type, only including relevant information.
      * 
      * @param iterable The FindIterable object to unpack
      * @param via What the ArrayList will consists of
@@ -232,9 +232,8 @@ public class MongoDBConnection {
      */
     public void uploadItems(Collection<Item> items) {
         ArrayList<WriteModel<Document>> bulkItems = new ArrayList<>();
-        FindIterable<Document> currentlyUploaded = collection.find();
-        
-        ArrayList<String> currentlyUploadedSKUs = unpack(currentlyUploaded, "SKU", String.class);
+        ArrayList<String> currentlyUploadedSKUs = unpack(collection.find(), 
+                "SKU", String.class);
         
         Thread uploadThread = new Thread(new Runnable() {
             @Override

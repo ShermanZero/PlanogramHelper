@@ -26,41 +26,29 @@ import pf.item.Item.SearchType;
  * @author      Kieran Skvortsov
  * employee#    72141
  */
-public class Processor {
-    
-
+public final class Processor {
     
     //the custom output stream for communication with the UI
-    private PipedOutputStream outputStream;
+    private static PipedOutputStream outputStream;
     
     //regex pattern that matches how products are listed
-    private final String REGEX_PRODUCT = "(?<POSITION>\\d+)\\s(?<SKU>\\d+)"
+    private static final String REGEX_PRODUCT = "(?<POSITION>\\d+)\\s(?<SKU>\\d+)"
             + "\\s(?=.*[a-zA-Z])(?<DESCRIPTION>(?:.*(?!\\d+\\W))*)\\s(?<UPC>\\d*)"
             + "\\s(?<FACINGS>\\d)\\s*(?<NEW>\\bNEW\\b){0,1}\\n*";
     
     //regex pattern that matches how locations are listed
-    private final String REGEX_LOCATION = "(?:Fixture)\\s(?:(?!\\d).)*"
+    private static final String REGEX_LOCATION = "(?:Fixture)\\s(?:(?!\\d).)*"
             + "(?<FIXTURE>(?:\\w|[.])*)\\s(?:Name)\\s(?<NAME>.*)";
     
     //an arraylist to hold individual item objects
-    private PlanogramHandler planogramHandler = new PlanogramHandler();
-    private ArrayList<Item> itemsFound = new ArrayList<>();
+    private static PlanogramHandler planogramHandler = new PlanogramHandler();
+    private static ArrayList<Item> itemsFound = new ArrayList<>();
     
     //the connection to the remote database
-    private MongoDBConnection mongoDBConnection;
+    private static MongoDBConnection mongoDBConnection = new MongoDBConnection(); 
     
-    /**
-     * Creates a new processor object which binds an input stream for
-     * cross-communication between the UI and backend, and initializes a 
-     * connection to the remote database.
-     * 
-     * @param inputStream 
-     */
-    public Processor(PipedInputStream inputStream) {
-        bindPipe(inputStream);
-        
-        mongoDBConnection = new MongoDBConnection();
-    }
+    //prevent instantiation
+    private Processor() {}
     
     /**
      * Binds the standard System::out pipeline to a custom output pipeline for
@@ -68,7 +56,7 @@ public class Processor {
      * 
      * @param inputStream The PipedInputStream object to bind to
      */
-    public void bindPipe(PipedInputStream inputStream) {
+    public static void bindPipe(PipedInputStream inputStream) {
         if(outputStream != null)
             try {
                 outputStream.close();
@@ -93,7 +81,7 @@ public class Processor {
      * 
      * @return The ArrayList of Items
      */
-    public ArrayList<Item> getAllItems() {
+    public static ArrayList<Item> getAllItems() {
         return planogramHandler.getAllItems();
     }
 
@@ -105,7 +93,7 @@ public class Processor {
      * 
      * @param callback The callback execution to run on finish
      */
-    public void pullFromMongoDB(Consumer<Planogram> callback) {
+    public static void pullFromMongoDB(Consumer<Planogram> callback) {
         //start the thread to pull items and when finished
         //  create a new planogram
         mongoDBConnection.pullAllItems((items) -> {
@@ -121,7 +109,7 @@ public class Processor {
      * @param file The file to parse
      * @param callback The callback execution to run on finish
      */
-    public void startParsing(File file, Runnable callback) {
+    public static void startParsing(File file, Runnable callback) {
         Thread parsingThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -146,7 +134,8 @@ public class Processor {
      * @throws IOException
      * @throws InterruptedException 
      */
-    public synchronized void parseToPlanogram(File file) throws IOException, InterruptedException {
+    public static synchronized void parseToPlanogram(File file) throws 
+            IOException, InterruptedException {
         //an array to hold strings for each page
         String[] pageStrings;
         
@@ -270,7 +259,7 @@ public class Processor {
      * @param items The Items in the planogram
      * @return The Planogram object created
      */
-    private Planogram createNewPlanogram(String name, ArrayList<Item> items) {
+    private static Planogram createNewPlanogram(String name, ArrayList<Item> items) {
         Planogram p = new Planogram(name);
         p.addItems(items);
         
@@ -284,7 +273,7 @@ public class Processor {
      * @param itemSKUs The Item objects
      * @return A printer-friendly String of items
      */
-    public String getPrintableSheet(ArrayList<String> itemSKUs) {
+    public static String getPrintableSheet(ArrayList<String> itemSKUs) {
         StringBuilder sb = new StringBuilder();
         sb.append(Launcher.APP_ARTIFACTID);
         sb.append(" v");
@@ -309,7 +298,7 @@ public class Processor {
      * @param searchType The SearchType to query by
      * @return 
      */
-    public Item[] search(String query, SearchType searchType) {
+    public static Item[] search(String query, SearchType searchType) {
         if(planogramHandler.isEmpty()) return null;
         
         //clear the arraylist
@@ -339,7 +328,7 @@ public class Processor {
     /**
      * Resets all data in the locally instanced {@link PlanogramHandler}
      */
-    public void reset() {
+    public static void reset() {
         planogramHandler.clear();
         itemsFound.clear();
     }
@@ -351,7 +340,7 @@ public class Processor {
      * 
      * DEVELOPMENT ONLY.
      */
-    public void resetMongoDB() {
+    public static void resetMongoDB() {
         mongoDBConnection.deleteAll();
     }
     
@@ -361,7 +350,7 @@ public class Processor {
      * 
      * DEVELOPMENT ONLY.
      */
-    public void uploadItemsToMongoDB() {
+    public static void uploadItemsToMongoDB() {
         mongoDBConnection.uploadItems(planogramHandler.getAllItems());
     }
     

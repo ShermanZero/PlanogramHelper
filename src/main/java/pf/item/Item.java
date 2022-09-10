@@ -201,11 +201,11 @@ public class Item implements Serializable {
         String[] parsedFixture = fixture.split("[.]");
         
         StringBuilder sb = new StringBuilder();
-        sb.append("Section #");
+        sb.append("SECTION #");
         sb.append(Integer.parseInt(parsedFixture[0]));
-        sb.append(" | Shelf #");
+        sb.append(" | SHELF #");
         sb.append(Integer.parseInt(parsedFixture[1]));
-        sb.append(" | Slot #");
+        sb.append(" | SLOT #");
         sb.append(position);
         
         friendlyLocation = sb.toString();
