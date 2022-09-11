@@ -24,6 +24,10 @@ public class Main extends javax.swing.JFrame {
     //instance variable to reference settings to make sure only one Settings
     //  window is open at any time
     private static Settings settings;
+    
+    //instance variable to reference uploader to make sure only one Uploader
+    //  window is open at any time
+    private static Uploader uploader;
 
     public Main() {
         Processor.bindPipe(inputStream);
@@ -36,11 +40,6 @@ public class Main extends javax.swing.JFrame {
 
         //start the input/output piped connection for System::out
         startPipeThread();
-
-        //if startup settings say to upload local planograms
-        if (Boolean.parseBoolean(UserSettings.getProperty("startup.upload"))) {
-            menuItem_reuploadActionPerformed(null);
-        }
 
         //if startup settings say to download from database
         if (Boolean.parseBoolean(UserSettings.getProperty("startup.download"))) {
@@ -64,40 +63,37 @@ public class Main extends javax.swing.JFrame {
      * output stream
      */
     private void startPipeThread() {
-        Thread streamPipeReaderThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //run indefinitely
-                while (true) {
-                    //create a new input stream if null
-                    if (inputStream != null) {
-                        try {
-                            int data;
-
-                            while ((data = inputStream.read()) != -1) {
-                                textArea_output.append(Character.toString((char) data));
-                                textArea_output.setCaretPosition(textArea_output.getText().length());
-                            }
-                        } catch (IOException ex) {
-                            System.err.println(ex);
-                        }
-                    }
-
+        Thread streamPipeReaderThread = new Thread(() -> {
+            //run indefinitely
+            while (true) {
+                //create a new input stream if null
+                if (inputStream != null) {
                     try {
-                        //close and discard the inputstream
-                        if (inputStream != null) {
-                            inputStream.close();
-                            inputStream = null;
+                        int data;
+                        
+                        while ((data = inputStream.read()) != -1) {
+                            textArea_output.append(Character.toString((char) data));
+                            textArea_output.setCaretPosition(textArea_output.getText().length());
                         }
-
-                        //create a new input stream
-                        inputStream = new PipedInputStream();
-
-                        //bind the new input stream to the processor
-                        Processor.bindPipe(inputStream);
                     } catch (IOException ex) {
                         System.err.println(ex);
                     }
+                }
+                
+                try {
+                    //close and discard the inputstream
+                    if (inputStream != null) {
+                        inputStream.close();
+                        inputStream = null;
+                    }
+                    
+                    //create a new input stream
+                    inputStream = new PipedInputStream();
+                    
+                    //bind the new input stream to the processor
+                    Processor.bindPipe(inputStream);
+                } catch (IOException ex) {
+                    System.err.println(ex);
                 }
             }
         });
@@ -138,7 +134,6 @@ public class Main extends javax.swing.JFrame {
         panel_developer = new javax.swing.JPanel();
         scrollPane_textArea_output = new javax.swing.JScrollPane();
         textArea_output = new javax.swing.JTextArea();
-        button_publish = new javax.swing.JButton();
         button_reset = new javax.swing.JButton();
         panelGroupBottom = new javax.swing.JPanel();
         textField_input = new javax.swing.JTextField();
@@ -146,7 +141,6 @@ public class Main extends javax.swing.JFrame {
         button_search = new javax.swing.JButton();
         button_clear = new javax.swing.JButton();
         progressBar = new javax.swing.JProgressBar();
-        button_upload = new javax.swing.JButton();
         button_print = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         itemCustomJTable = new pf.gui.custom.ItemCustomJTable();
@@ -154,8 +148,6 @@ public class Main extends javax.swing.JFrame {
         planogramCustomJTable = new pf.gui.custom.PlanogramCustomJTable();
         menuBar = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
-        menuItem_upload = new javax.swing.JMenuItem();
-        menuItem_reupload = new javax.swing.JMenuItem();
         menuItem_pullFromDatabase = new javax.swing.JMenuItem();
         menuItem_print = new javax.swing.JMenuItem();
         separator01 = new javax.swing.JPopupMenu.Separator();
@@ -163,6 +155,7 @@ public class Main extends javax.swing.JFrame {
         menuItem_github = new javax.swing.JMenuItem();
         separator02 = new javax.swing.JPopupMenu.Separator();
         menuItem_about = new javax.swing.JMenuItem();
+        menuItem_uploader = new javax.swing.JMenuItem();
         menuItem_settings = new javax.swing.JMenuItem();
         menuItem_exit = new javax.swing.JMenuItem();
         separator03 = new javax.swing.JPopupMenu.Separator();
@@ -184,20 +177,6 @@ public class Main extends javax.swing.JFrame {
         textArea_output.setRows(5);
         scrollPane_textArea_output.setViewportView(textArea_output);
 
-        button_publish.setBackground(new java.awt.Color(153, 153, 153));
-        button_publish.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button_publish.setForeground(new java.awt.Color(51, 51, 51));
-        button_publish.setText("PUBLISH");
-        button_publish.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        button_publish.setMaximumSize(new java.awt.Dimension(26, 26));
-        button_publish.setMinimumSize(new java.awt.Dimension(26, 26));
-        button_publish.setPreferredSize(new java.awt.Dimension(26, 26));
-        button_publish.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button_publishActionPerformed(evt);
-            }
-        });
-
         button_reset.setBackground(new java.awt.Color(115, 72, 72));
         button_reset.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         button_reset.setForeground(new java.awt.Color(204, 204, 204));
@@ -218,26 +197,19 @@ public class Main extends javax.swing.JFrame {
             panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_developerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPane_textArea_output)
+                .addComponent(scrollPane_textArea_output, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(button_publish, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
-                    .addComponent(button_reset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(button_reset, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         panel_developerLayout.setVerticalGroup(
             panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_developerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_developerLayout.createSequentialGroup()
-                        .addComponent(button_publish, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(59, 59, 59))
-                    .addGroup(panel_developerLayout.createSequentialGroup()
-                        .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(scrollPane_textArea_output, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(button_reset, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
+                .addGroup(panel_developerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(scrollPane_textArea_output, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                    .addComponent(button_reset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelGroupBottom.setBackground(new java.awt.Color(51, 51, 51));
@@ -303,20 +275,6 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        button_upload.setBackground(new java.awt.Color(153, 153, 153));
-        button_upload.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button_upload.setForeground(new java.awt.Color(51, 51, 51));
-        button_upload.setText("UPLOAD");
-        button_upload.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        button_upload.setMaximumSize(new java.awt.Dimension(26, 26));
-        button_upload.setMinimumSize(new java.awt.Dimension(26, 26));
-        button_upload.setPreferredSize(new java.awt.Dimension(26, 26));
-        button_upload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button_uploadActionPerformed(evt);
-            }
-        });
-
         button_print.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         button_print.setText("PRINT");
         button_print.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -346,9 +304,8 @@ public class Main extends javax.swing.JFrame {
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panel_mainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(button_print, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addComponent(button_upload, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(button_print, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                            .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                     .addComponent(jScrollPane1)
                     .addComponent(panel_developer, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -366,35 +323,15 @@ public class Main extends javax.swing.JFrame {
                     .addGroup(panel_mainLayout.createSequentialGroup()
                         .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(button_upload, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(button_print, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(button_print, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(panelGroupBottom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         menu_file.setText("File");
 
-        menuItem_upload.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_U, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        menuItem_upload.setText("Upload Planogram");
-        menuItem_upload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItem_uploadActionPerformed(evt);
-            }
-        });
-        menu_file.add(menuItem_upload);
-
-        menuItem_reupload.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_U, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        menuItem_reupload.setText("Reupload Planograms");
-        menuItem_reupload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItem_reuploadActionPerformed(evt);
-            }
-        });
-        menu_file.add(menuItem_reupload);
-
         menuItem_pullFromDatabase.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        menuItem_pullFromDatabase.setText("Pull from Database");
+        menuItem_pullFromDatabase.setText("Fetch From Database");
         menuItem_pullFromDatabase.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItem_pullFromDatabaseActionPerformed(evt);
@@ -427,6 +364,15 @@ public class Main extends javax.swing.JFrame {
             }
         });
         menu_file.add(menuItem_about);
+
+        menuItem_uploader.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_uploader.setText("Uploader");
+        menuItem_uploader.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_uploaderActionPerformed(evt);
+            }
+        });
+        menu_file.add(menuItem_uploader);
 
         menuItem_settings.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItem_settings.setText("Settings");
@@ -496,17 +442,6 @@ public class Main extends javax.swing.JFrame {
         itemCustomJTable.printSheet();
     }//GEN-LAST:event_button_printActionPerformed
 
-    /**
-     * Opens a file chooser window allowing for selection of pdf files
-     *
-     * @param evt
-     */
-    private void button_uploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_uploadActionPerformed
-        planogramCustomJTable.addFile(() -> {
-            button_searchActionPerformed(null);
-        });
-    }//GEN-LAST:event_button_uploadActionPerformed
-
     private void button_clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_clearActionPerformed
         itemCustomJTable.clear(false);
     }//GEN-LAST:event_button_clearActionPerformed
@@ -529,10 +464,6 @@ public class Main extends javax.swing.JFrame {
         textField_input.selectAll();
         textField_input.requestFocus();
     }//GEN-LAST:event_button_searchActionPerformed
-
-    private void menuItem_uploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_uploadActionPerformed
-        button_uploadActionPerformed(null);
-    }//GEN-LAST:event_menuItem_uploadActionPerformed
 
     /**
      * Exits the program cleanly
@@ -606,22 +537,6 @@ public class Main extends javax.swing.JFrame {
         });
     }//GEN-LAST:event_menuItem_settingsActionPerformed
 
-    /**
-     * Clears/resets the view model and backend-data, and re-processes all
-     * defined planograms
-     *
-     * @param evt
-     */
-    private void menuItem_reuploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_reuploadActionPerformed
-        resetUI();
-
-        //TODO: Add local re-upload implementation
-    }//GEN-LAST:event_menuItem_reuploadActionPerformed
-
-    private void button_publishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_publishActionPerformed
-        Processor.uploadItemsToMongoDB();
-    }//GEN-LAST:event_button_publishActionPerformed
-
     private void menuItem_pullFromDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_pullFromDatabaseActionPerformed
         resetUI();
 
@@ -645,6 +560,21 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_menuItem_licenseActionPerformed
 
+    private void menuItem_uploaderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_uploaderActionPerformed
+        JFrame parentWindow = this;
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                if (uploader != null) {
+                    uploader.dispose();
+                }
+
+                uploader = new Uploader(parentWindow);
+                uploader.setVisible(true);
+            }
+        });
+    }//GEN-LAST:event_menuItem_uploaderActionPerformed
+
     private void resetUI() {
         Processor.reset();
         itemCustomJTable.clear(false);
@@ -654,10 +584,8 @@ public class Main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_clear;
     private javax.swing.JButton button_print;
-    private javax.swing.JButton button_publish;
     private javax.swing.JButton button_reset;
     private javax.swing.JButton button_search;
-    private javax.swing.JButton button_upload;
     private javax.swing.JCheckBoxMenuItem checkBoxMenuItem_developer;
     private javax.swing.JComboBox<String> comboBox_searchType;
     private pf.gui.custom.ItemCustomJTable itemCustomJTable;
@@ -671,9 +599,8 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem_license;
     private javax.swing.JMenuItem menuItem_print;
     private javax.swing.JMenuItem menuItem_pullFromDatabase;
-    private javax.swing.JMenuItem menuItem_reupload;
     private javax.swing.JMenuItem menuItem_settings;
-    private javax.swing.JMenuItem menuItem_upload;
+    private javax.swing.JMenuItem menuItem_uploader;
     private javax.swing.JMenu menu_file;
     private javax.swing.JMenu menu_view;
     private javax.swing.JPanel panelGroupBottom;

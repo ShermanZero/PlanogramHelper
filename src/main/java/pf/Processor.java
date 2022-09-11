@@ -107,18 +107,18 @@ public final class Processor {
      * runs a {@link Runnable} callback.
      * 
      * @param file The file to parse
+     * @param planogramName The name of the planogram to associate with the items
      * @param callback The callback execution to run on finish
      */
-    public static void startParsing(File file, Runnable callback) {
-        Thread parsingThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    parseToPlanogram(file);
+    public static void startParsing(File file, String planogramName, Runnable callback) {
+        Thread parsingThread = new Thread(() -> {
+            try {
+                parseToPlanogram(file, planogramName);
+                
+                if(callback != null)
                     callback.run();
-                } catch (IOException | InterruptedException ex) {
-                    System.out.println(ex);
-                }
+            } catch (IOException | InterruptedException ex) {
+                System.out.println(ex);
             }
         });
         
@@ -130,11 +130,12 @@ public final class Processor {
      * a synchronized method to prevent multi-threaded executions.
      * 
      * @param file Planogram PDF file
+     * @param planogramName The name of the planogram to associate with the items
      * 
      * @throws IOException
      * @throws InterruptedException 
      */
-    public static synchronized void parseToPlanogram(File file) throws 
+    public static synchronized void parseToPlanogram(File file, String planogramName) throws 
             IOException, InterruptedException {
         //an array to hold strings for each page
         String[] pageStrings;
@@ -222,7 +223,8 @@ public final class Processor {
                             productMatcher.group("UPC"),
                             Integer.parseInt(productMatcher.group("FACINGS")),
                             productMatcher.group("NEW") != null &&
-                            productMatcher.group("NEW").equalsIgnoreCase("new")
+                            productMatcher.group("NEW").equalsIgnoreCase("new"),
+                            planogramName
                         );
                     //set the fixture and name for the item
                     tempItem.setFixture(currFixture);
@@ -244,7 +246,7 @@ public final class Processor {
             System.out.println(String.format("[%d] items parsed from [%d] pages", 
                     tempItems.size(), pageStrings.length));
             
-            createNewPlanogram(file.getAbsolutePath(), tempItems);
+            createNewPlanogram(planogramName, tempItems);
         }
         
         //update the progress bar in the UI
@@ -342,16 +344,6 @@ public final class Processor {
      */
     public static void resetMongoDB() {
         mongoDBConnection.deleteAll();
-    }
-    
-    /**
-     * Uploads all Item objects currently stored within the 
-     * locally instanced {@link PlanogramHandler}
-     * 
-     * DEVELOPMENT ONLY.
-     */
-    public static void uploadItemsToMongoDB() {
-        mongoDBConnection.uploadItems(planogramHandler.getAllItems());
     }
     
     // </editor-fold>

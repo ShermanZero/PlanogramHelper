@@ -17,6 +17,7 @@ public class Item implements Serializable {
     private final String UPC;
     private final int facings;
     private final boolean isNew;
+    private final String planogramName;
     
     private String friendlyLocation;
     private String fixture;
@@ -40,14 +41,17 @@ public class Item implements Serializable {
      * @param UPC The Item's UPC
      * @param facings The Item's facings
      * @param isNew If the Item is new
+     * @param planogramName The name of the Planogram associated with the item
      */
-    public Item(int position, String SKU, String description, String UPC, int facings, boolean isNew) {
+    public Item(int position, String SKU, String description, String UPC, 
+            int facings, boolean isNew, String planogramName) {
         this.position = position;
         this.SKU = SKU.trim();
         this.description = description.trim();
         this.UPC = UPC.trim();
         this.facings = facings;
         this.isNew = isNew;
+        this.planogramName = planogramName;
     }
     
     /**
@@ -132,6 +136,14 @@ public class Item implements Serializable {
      */
     public boolean getIsNew() {
         return isNew;
+    }
+    
+    /**
+     * Returns the name of the Planogram associated with this item
+     * @return A Planogram name
+     */
+    public String getPlanogramName() {
+        return planogramName;
     }
     
     /**
