@@ -1,15 +1,12 @@
 # [PlanogramHelper](https://shermanzero.github.io/PlanogramHelper/)
 
-![image](https://user-images.githubusercontent.com/16752746/188516429-61b3ae2d-2b4c-4f73-a2b4-0bd276f883be.png)
+![image](https://user-images.githubusercontent.com/16752746/190447907-5b822f76-532b-4442-859e-5e93cd6f55e8.png)
 
 ### What does it do?
 Makes life easier for everyone!  (Finds any product in a planogram)
 
 ### Why does it do that?
 Because I told it to!  (Because I told it to)
-
-### When does it do that?
-As soon as you use it!
 
 ### How does it do that?
 So glad you asked!  Basically, you upload an epic KinneyDrugs®-issued planogram, it does some fancy-shmancy behind the scenes work, and presto you've got yourself a handy-dandy list of every product contained in the planogram, searchable by SKU, UPC, or even words!  It'll spit out whatever it can find that matches, just select the items you're looking for, hit that oversized print button, and listen to the heartwarming sounds of machinery as your printer cries happy tears for you.
@@ -29,6 +26,17 @@ Well then you should stop wasting your time reading this and look through the re
 
 ----
 ## Patch Notes
+
+### New to 0.3.4+
+- Major performance optimizations
+  - Locally cached serialized database drastically reduces time searching for and uploading Items
+- Serialization of custom objects framework skeleton
+- Separated and clarified UI elements into appropriate groupings
+- Updated Item locations to be extremely user-friendly for display in UI and when printing
+- Bug fixes include custom identification so that Items are not discarded as duplicates where necessary
+
+#### Breaking Changes
+  - Phasing out local planogram upload on start feature.  However, local planograms will remain uploadable through the new Uploader UI.
 
 ### New to 0.3.1+
 - Settings rehaul!
@@ -51,9 +59,8 @@ Well then you should stop wasting your time reading this and look through the re
 
 *It all comes together cleanly, quickly, and presentably to allow you to do this in under 30 seconds:*
 
-![image](https://user-images.githubusercontent.com/16752746/187807590-eaf35a17-a683-4670-b1d5-6581f985afc5.png)
-
-![image](https://user-images.githubusercontent.com/16752746/187807629-7ea0d00c-7269-4f2c-bf85-99544ffcda28.png)
+![image](https://user-images.githubusercontent.com/16752746/190450726-bb90d784-92f2-4719-997a-d747604e5ade.png)
+![image](https://user-images.githubusercontent.com/16752746/190450849-f921b368-0462-4626-99e5-741df6429f23.png)
 
 ----
 
