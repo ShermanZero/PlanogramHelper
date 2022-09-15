@@ -4,6 +4,8 @@ package pf.item;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.stream.Stream;
 import pf.item.Item.SearchType;
 
 /**
@@ -20,8 +22,8 @@ public class ItemHashMap extends HashMap<String, Item> {
      * @param c Collection of Item objects
      */
     public void putAll(Collection<Item> c) {
-        c.stream().forEach(item -> {
-            this.put(item.getSKU(), item);
+        c.stream().forEach(i -> {
+            this.put(i.getSKU()+getItemID(i), i);
         });
     }
     
@@ -31,7 +33,28 @@ public class ItemHashMap extends HashMap<String, Item> {
      * @param i Item object
      */
     public void put(Item i) {
-        this.put(i.getSKU(), i);
+        this.put(i.getSKU()+getItemID(i), i);
+    }
+    
+    /**
+     * Creates and returns a unique ID for any Item.  This prevents
+     * accidental duplicate removal in cases where the same product can
+     * be assigned to multiple different locations in a planogram.
+     * 
+     * @param i The Item to get an ID for
+     * @return A unique String ID for the Item
+     */
+    private String getItemID(Item i) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("@");
+        sb.append(i.getPlanogramName());
+        sb.append("+");
+        sb.append(i.getFixture());
+        sb.append("_");
+        sb.append(i.getPosition());
+        
+        return sb.toString();
     }
     
     /**
@@ -42,7 +65,11 @@ public class ItemHashMap extends HashMap<String, Item> {
      * @return If the HashMap contains the SKU
      */
     public boolean containsItem(String SKU) {
-        return this.containsKey(SKU);
+        Stream<String> results = this.keySet().stream().filter(id -> {
+           return id.contains(SKU);
+        });
+        
+        return results.count() != 0;
     }
     
     /**
@@ -53,7 +80,16 @@ public class ItemHashMap extends HashMap<String, Item> {
      * @return An Item object with the SKU
      */
     public Item getItem(String SKU) {
-        return this.get(SKU);
+        Stream<String> results = this.keySet().stream().filter(id -> {
+           String noID = id.split("@")[0];
+           return noID.contains(SKU);
+        });
+        
+        Optional<String> first = results.findFirst();
+        String id = first.get();
+        
+        if(id == null) return null;
+        return this.get(id);
     }
     
     /**
@@ -68,13 +104,14 @@ public class ItemHashMap extends HashMap<String, Item> {
     public ArrayList<Item> findByQuery(String query, SearchType searchType) {
         ArrayList<Item> results = new ArrayList<Item>();
         
-        this.keySet().stream().forEach(SKU -> {
-            Item i = this.get(SKU);
-            
+        this.keySet().stream().forEach(id -> {
+            Item i = this.get(id);
+            String noIDSKU = id.split("@")[0];
+
             String UPC  = i.getUPC();
             String desc = i.getDescription().toLowerCase();
             
-            if(searchType == SearchType.SKU && SKU.endsWith(query)) 
+            if(searchType == SearchType.SKU && noIDSKU.endsWith(query)) 
                 results.add(i);
             else
             if(searchType == SearchType.UPC && UPC.endsWith(query)) 

@@ -1,6 +1,7 @@
 package pf;
 
 import com.mongodb.MongoBulkWriteException;
+import com.mongodb.MongoCommandException;
 import com.mongodb.client.FindIterable;
 import static com.mongodb.client.model.Filters.*;
 
@@ -20,7 +21,9 @@ import pf.gui.Main;
 import pf.item.Item;
 
 /**
- *
+ * The MongoDBConnection class handles all backend processing with the remote
+ * MongoDB database used for storing/updating/retrieving a master list of Items
+ * 
  * @author Kieran Skvortsov employee# 72141
  */
 public class MongoDBConnection {
@@ -48,9 +51,10 @@ public class MongoDBConnection {
                 || clusterUser.length() == 0 || clusterPass.length() == 0) {
             //check if custom authentication has been enabled in the UI
             if (Boolean.parseBoolean(UserSettings.getProperty("auth.custom"))) {
-                clusterUser = UserSettings.getProperty("auth.user");
-                clusterPass = UserSettings.getProperty("auth.pass");
+                System.err.println("Using custom authentication");
                 
+                clusterUser = UserSettings.getProperty("auth.username");
+                clusterPass = UserSettings.getProperty("auth.password");
             //check if authentication was passed as via command-line as a property
             } else {
                 clusterUser = System.getProperty("db.user", null);
@@ -311,7 +315,11 @@ public class MongoDBConnection {
      * Development purposes only - wipes the database.
      */
     public void deleteAll() {
-        collection.deleteMany(regex("DESC", ""));
+        try {
+            collection.deleteMany(regex("SKU", ""));
+        } catch (MongoCommandException mce) {
+            System.err.println(mce);
+        }
     }
 
     /**

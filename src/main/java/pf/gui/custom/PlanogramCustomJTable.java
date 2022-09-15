@@ -58,7 +58,7 @@ public class PlanogramCustomJTable extends JTable {
         File f = null;
         if(returnVal == JFileChooser.APPROVE_OPTION) {
             f = fileChooser.getSelectedFile();
-            Processor.startParsing(f, () -> {
+            Processor.startParsing(f, "", () -> {
                 callback.run();
             });
         

@@ -8,7 +8,7 @@ import pf.item.Item.SearchType;
 /**
  *
  * @author      Kieran Skvortsov
- * employee#   72141
+ * employee#    72141
  */
 public class PlanogramHandler extends ArrayList<Planogram> {
     
@@ -60,6 +60,11 @@ public class PlanogramHandler extends ArrayList<Planogram> {
         return itemsFound;
     }
     
+    /**
+     * Returns an ArrayList containing all Items from all planograms
+     * 
+     * @return An ArrayList of all Items from all planograms
+     */
     public ArrayList<Item> getAllItems() {
         ArrayList<Item> items = new ArrayList<>();
         

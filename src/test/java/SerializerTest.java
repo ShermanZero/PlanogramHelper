@@ -47,8 +47,7 @@ public class SerializerTest {
                     String.valueOf((int)(Math.random()*10000000f)), 
                     "N/A", 
                     String.valueOf((int)(Math.random()*10000000000f)), 
-                    0,
-                    false);
+                    0, false, "test");
             
             items.add(item);
         }

@@ -85,6 +85,7 @@ public final class UserSettings {
         }
         
         loaded = true;
+        System.err.println("Finished loading local properties");
     }
     
     /**
